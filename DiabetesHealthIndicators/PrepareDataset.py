@@ -4,7 +4,7 @@ from Assignment1.Helpers import plot_histogram, get_correlation, calculate_varia
     scale_data
 
 # Not much data to be pre-processed here.
-df_diabetes = pd.read_csv('./DiabetesHealthIndicators.csv')
+df_diabetes = pd.read_csv('Data/DiabetesHealthIndicators.csv')
 
 x_train, x_test, y_train, y_test = split_data(df_diabetes, 'Diabetes_binary')
 x_train_scaled, x_test_scaled = scale_data(x_train, x_test)

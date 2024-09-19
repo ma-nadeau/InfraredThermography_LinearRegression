@@ -57,7 +57,7 @@ def preprocess_thermography_data(file_name):
     return df_thermography
 
 
-preprocessed_data = preprocess_thermography_data('./InfraredThermographyTemperature.csv')
+preprocessed_data = preprocess_thermography_data('Data/InfraredThermographyTemperature.csv')
 x_train, x_test, y_train, y_test = split_data(preprocessed_data, 'aveOralM')
 x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
