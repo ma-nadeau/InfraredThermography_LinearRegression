@@ -52,7 +52,6 @@ def preprocess_thermography_data(file_name):
     df_thermography['Gender'] = label_encoder.fit_transform(df_thermography['Gender'])
     df_thermography['Ethnicity'] = label_encoder.fit_transform(df_thermography['Ethnicity'])
 
-    # Delete rows with missing values (entries in the 'Distance' feature column).
     df_thermography = df_thermography.fillna(df_thermography.mean())
 
     return df_thermography
@@ -63,5 +62,5 @@ x_train, x_test, y_train, y_test = split_data(preprocessed_data, 'aveOralM')
 x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
 plot_histogram(preprocessed_data)
-get_correlation(preprocessed_data, 'aveOralM')
-calculate_variance_inflation_factor(preprocessed_data)
+print(get_correlation(preprocessed_data, 'aveOralM'))
+print(calculate_variance_inflation_factor(preprocessed_data))
