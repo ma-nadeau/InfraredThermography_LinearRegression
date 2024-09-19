@@ -1,8 +1,8 @@
 import pandas as pd
-from matplotlib import pyplot as plt
-from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.model_selection import train_test_split
-from statsmodels.stats.outliers_influence import variance_inflation_factor
+from sklearn.preprocessing import LabelEncoder
+
+from Assignment1.Helpers import plot_histogram, get_correlation, calculate_variance_inflation_factor, split_data, \
+    scale_data
 
 
 def preprocess_thermography_data(file_name):
@@ -58,44 +58,8 @@ def preprocess_thermography_data(file_name):
     return df_thermography
 
 
-def split_data(df_thermography):
-    y = df_thermography['aveOralM']
-    x = df_thermography.drop(['aveOralM'], axis=1)
-    x_train_data, x_test_data, y_train_data, y_test_data = train_test_split(x, y, test_size=0.2, random_state=0)
-    return x_train_data, x_test_data, y_train_data, y_test_data
-
-
-def scale_data(x_train_data, x_test_data):
-    scaler = StandardScaler()
-    x_train_data_scaled = scaler.fit_transform(x_train_data)
-    x_test_data_scaled = scaler.transform(x_test_data)
-    return x_train_data_scaled, x_test_data_scaled
-
-
-# Plot histogram for each feature.
-def plot_histogram(df, bins=10, figsize=(14,14)):
-    df.hist(bins=10, figsize=(14, 14))
-    plt.tight_layout()
-    plt.show()
-
-
-# Obtain correlation matrix.
-def get_correlation(df, feature):
-    correlation_matrix = df.corr()
-    correlation = correlation_matrix[feature]
-    return correlation
-
-
-# Obtain Variance Inflation Factor (VIF)
-def calculate_variance_inflation_factor(df):
-    vif = pd.DataFrame()
-    vif["VIF Factor"] = [variance_inflation_factor(df.values, i) for i in range(df.shape[1])]
-    vif["Feature"] = df.columns
-    return vif
-
-
 preprocessed_data = preprocess_thermography_data('./InfraredThermographyTemperature.csv')
-x_train, x_test, y_train, y_test = split_data(preprocessed_data)
+x_train, x_test, y_train, y_test = split_data(preprocessed_data, 'aveOralM')
 x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
 plot_histogram(preprocessed_data)
