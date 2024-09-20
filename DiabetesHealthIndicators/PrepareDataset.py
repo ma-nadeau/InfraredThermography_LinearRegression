@@ -10,8 +10,8 @@ x_train, x_test, y_train, y_test = split_data(df_diabetes, 'Diabetes_binary')
 x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
 plot_histogram(df_diabetes)
-print(get_correlation(df_diabetes, 'Diabetes_binary'))
-print(calculate_variance_inflation_factor(df_diabetes))
+get_correlation(df_diabetes, 'Diabetes_binary')
+calculate_variance_inflation_factor(df_diabetes)
 
 # Education vif = 29.72, correlation w/ target is low. Education and Income are correlated (0.44), could keep Income.
 # AnyHealthcare vif = 20.93, correlation w/ target very low (0.016).

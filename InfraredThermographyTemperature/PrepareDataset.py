@@ -38,8 +38,8 @@ def preprocess_thermography_data(file_name):
         iqr = q3 - q1
 
         # Define lower and upper bounds
-        lower_bound = q1 - 1.5 * iqr
-        upper_bound = q3 + 1.5 * iqr
+        lower_bound = q1 - 2.5 * iqr
+        upper_bound = q3 + 2.5 * iqr
 
         # Remove outliers
         df.drop(df[(df[column_name] < lower_bound) | (df[column_name] > upper_bound)].index, inplace=True)
@@ -52,6 +52,7 @@ def preprocess_thermography_data(file_name):
     df_thermography['Gender'] = label_encoder.fit_transform(df_thermography['Gender'])
     df_thermography['Ethnicity'] = label_encoder.fit_transform(df_thermography['Ethnicity'])
 
+    # Replace empty values with mean of values in that column.
     df_thermography = df_thermography.fillna(df_thermography.mean())
 
     return df_thermography
@@ -62,5 +63,5 @@ x_train, x_test, y_train, y_test = split_data(preprocessed_data, 'aveOralM')
 x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
 plot_histogram(preprocessed_data)
-print(get_correlation(preprocessed_data, 'aveOralM'))
-print(calculate_variance_inflation_factor(preprocessed_data))
+get_correlation(preprocessed_data, 'aveOralM')
+calculate_variance_inflation_factor(preprocessed_data)
