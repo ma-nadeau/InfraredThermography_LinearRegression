@@ -1,7 +1,9 @@
 import pandas as pd
+from PIL.ImageOps import fit
 from sklearn.preprocessing import LabelEncoder
 
 from Assignment1.Helpers import *
+from LinearRegression import *
 
 
 def preprocess_thermography_data(file_name):
@@ -62,24 +64,43 @@ def preprocess_thermography_data(file_name):
     return df_thermography
 
 
-preprocessed_data = preprocess_thermography_data(
-    "Data/InfraredThermographyTemperature.csv"
-)
-x_train, x_test, y_train, y_test = split_data(preprocessed_data, "aveOralM")
-x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
+def perform_plotting(df_thermography):
 
-plot_histogram(
-    preprocessed_data,
-    "Results",
-    "Histogram_Infrared_Thermography_Temperature.png",
-)
-compute_and_plot_correlation(
-    preprocessed_data,
-    "aveOralM",
-    "Results",
-    "Correlation_Infrared_Thermography_Temperature.png",
-)
+    plot_histogram(
+        df_thermography,
+        "Results",
+        "Histogram_Infrared_Thermography_Temperature.png",
+    )
+    compute_and_plot_correlation(
+        df_thermography,
+        "aveOralM",
+        "Results",
+        "Correlation_Infrared_Thermography_Temperature.png",
+    )
 
-get_correlation(preprocessed_data, "aveOralM")
 
-calculate_variance_inflation_factor(preprocessed_data)
+def fetch_Data():
+    return preprocess_thermography_data("Data/InfraredThermographyTemperature.csv")
+
+
+def perform_linear_regression(preprocessed_data):
+    x_train, x_test, y_train, y_test = split_data(preprocessed_data, "aveOralM")
+    x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
+
+    lr = LinearRegression()
+    lr.fit(x_train_scaled, y_train)
+    yh = lr.predict(x_test_scaled)
+
+    plot_actual_vs_predicted(y_test, yh, "aveOralM", "Results")
+
+    print(calculate_variance_inflation_factor(preprocessed_data))
+
+
+def main():
+    df = fetch_Data()
+    perform_linear_regression(df)
+    perform_plotting(df)
+
+
+if __name__ == "__main__":
+    main()

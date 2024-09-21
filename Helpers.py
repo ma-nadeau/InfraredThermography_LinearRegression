@@ -75,3 +75,35 @@ def scale_data(x_train_data, x_test_data):
     x_train_data_scaled = scaler.fit_transform(x_train_data)
     x_test_data_scaled = scaler.transform(x_test_data)
     return x_train_data_scaled, x_test_data_scaled
+
+
+def plot_actual_vs_predicted(y_test, y_hat, target_name, output_folder):
+    plt.figure(figsize=(10, 6))
+
+    plt.scatter(
+        y_test,
+        y_hat,
+        alpha=0.5,
+        color="blue",
+        label=f"Predicted vs. Actual of {target_name}",
+    )
+    plt.xlabel(f"Actual Values of {target_name}")
+    plt.ylabel(f"Predicted Values of {target_name}")
+    plt.title(f"Actual vs. Predicted Values of {target_name}")
+
+    # Prediction line
+    plt.plot(
+        [min(y_test), max(y_test)],
+        [min(y_test), max(y_test)],
+        color="red",
+        linestyle="--",
+        label=f"Perfect Prediction Line of {target_name}",
+    )
+
+    plt.legend()
+
+    plot_path = os.path.join(
+        output_folder, f"Graph_Actual_vs_Predicted Value_Linear_Regression.png"
+    )
+    plt.savefig(plot_path)
+    plt.close()
