@@ -1,16 +1,25 @@
 import pandas as pd
 
-from Assignment1.Helpers import plot_histogram, get_correlation, calculate_variance_inflation_factor, split_data, \
-    scale_data
+from Assignment1.Helpers import *
 
 # Not much data to be pre-processed here.
-df_diabetes = pd.read_csv('Data/DiabetesHealthIndicators.csv')
+df_diabetes = pd.read_csv("Data/DiabetesHealthIndicators.csv")
 
-x_train, x_test, y_train, y_test = split_data(df_diabetes, 'Diabetes_binary')
+x_train, x_test, y_train, y_test = split_data(df_diabetes, "Diabetes_binary")
 x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
-plot_histogram(df_diabetes)
-get_correlation(df_diabetes, 'Diabetes_binary')
+plot_histogram(
+    df_diabetes,
+    "Results",
+    "Histogram_Diabetes_Health_Indicators.png",
+)
+compute_and_plot_correlation(
+    df_diabetes,
+    "Diabetes_binary",
+    "Results",
+    "Correlation_Diabetes_Health_Indicators.png",
+)
+get_correlation(df_diabetes, "Diabetes_binary")
 calculate_variance_inflation_factor(df_diabetes)
 
 # Education vif = 29.72, correlation w/ target is low. Education and Income are correlated (0.44), could keep Income.
