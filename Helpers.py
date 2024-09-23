@@ -4,6 +4,9 @@ from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+from sklearn.metrics import confusion_matrix, roc_curve, auc
+import numpy as np
+import seaborn as sns
 
 
 def plot_histogram(df, output_folder=None, filename="histogram.png"):
@@ -31,7 +34,49 @@ def calculate_variance_inflation_factor(df):
         variance_inflation_factor(df.values, i) for i in range(df.shape[1])
     ]
     vif["Feature"] = df.columns
+    print(vif)
     return vif
+
+
+def plot_variance_inflation_factor(
+    df, target, output_folder=None, filename="variance_inflation_factor.png"
+):
+    # Calculate the VIF for each feature
+    vif = pd.DataFrame()
+    vif["VIF Factor"] = [
+        variance_inflation_factor(df.values, i) for i in range(df.shape[1])
+    ]
+    vif["Feature"] = df.columns
+
+    # Sort the VIF values
+    vif_sorted = vif.sort_values(by="VIF Factor", ascending=False)
+
+    # Set up the matplotlib figure
+    plt.figure(figsize=(10, 6))
+    ax = vif_sorted.plot(
+        kind="bar", x="Feature", y="VIF Factor", legend=False, color="skyblue"
+    )
+    plt.grid(True, which="both", axis="y", linestyle="--")
+
+    # Annotate bars with VIF values
+    for idx, value in enumerate(vif_sorted["VIF Factor"]):
+        ax.text(idx, value + 0.02, f"{value:.2f}", ha="center", va="bottom")
+
+    # Set titles and labels
+    plt.title(
+        f"Variance Inflation Factor (VIF) for Features\n(Target: {target})", fontsize=14
+    )
+    plt.ylabel("VIF Factor", fontsize=12)
+    plt.xlabel("Features", fontsize=12)
+
+    plt.xticks(rotation=45)
+
+    # Save the plot if output_folder is specified
+    if output_folder:
+        plt.tight_layout()
+        plot_path = os.path.join(output_folder, filename)
+        plt.savefig(plot_path)
+    plt.close()
 
 
 # Plot all correlations.
@@ -105,5 +150,62 @@ def plot_actual_vs_predicted(y_test, y_hat, target_name, output_folder):
     plot_path = os.path.join(
         output_folder, f"Graph_Actual_vs_Predicted Value_Linear_Regression.png"
     )
+    plt.savefig(plot_path)
+    plt.close()
+
+
+def plot_correlation_matrix(X, output_folder="Results", title="Correlation Matrix"):
+    plt.figure(figsize=(20, 20))
+    heatmap = sns.heatmap(X.corr(), vmin=-1, vmax=1, annot=True, cmap="Blues")
+    heatmap.set_title("CDC Data Correlation heatmap", fontdict={"fontsize": 10}, pad=12)
+    plot_path = os.path.join(output_folder, title)
+    plt.savefig(plot_path)
+    plt.close()
+
+
+def plot_confusion_matrix(
+    y_true, y_hat, output_folder="Results", title="Confusion Matrix"
+):
+    cm = confusion_matrix(y_true, y_hat)
+    plt.figure(figsize=(6, 6))
+    plt.imshow(cm, interpolation="nearest", cmap=plt.cm.Blues)
+    plt.title(title)
+    plt.colorbar()
+    plt.xlabel("Predicted label")
+    plt.ylabel("True label")
+    tick_marks = np.arange(2)
+    plt.xticks(tick_marks, ["False", "True"])
+    plt.yticks(tick_marks, ["False", "True"])
+
+    thresh = cm.max() / 2.0
+    for i, j in np.ndindex(cm.shape):
+        plt.text(
+            j,
+            i,
+            format(cm[i, j], "d"),
+            horizontalalignment="center",
+            color="white" if cm[i, j] > thresh else "black",
+        )
+
+    plt.tight_layout()
+    plot_path = os.path.join(output_folder, f"{title}.png")
+    plt.savefig(plot_path)
+    plt.close()
+
+
+def plot_roc_curve(y_true, y_hat, output_folder="Results", title="ROC_Curve"):
+    fpr, tpr, _ = roc_curve(y_true, y_hat)
+    roc_auc = auc(fpr, tpr)
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(fpr, tpr, color="blue", lw=2, label=f"ROC curve (area = {roc_auc:.2f})")
+    plt.plot([0, 1], [0, 1], color="gray", linestyle="--")
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title("Receiver Operating Characteristic")
+    plt.legend(loc="lower right")
+    plot_path = os.path.join(output_folder, f"{title}.png")
     plt.savefig(plot_path)
     plt.close()
