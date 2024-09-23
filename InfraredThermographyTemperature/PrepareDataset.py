@@ -1,8 +1,7 @@
-import pandas as pd
-from PIL.ImageOps import fit
 from sklearn.preprocessing import LabelEncoder
 
 from Assignment1.Helpers import *
+from MiniBatchStochasticLinearRegression import *
 from LinearRegression import *
 
 
@@ -93,12 +92,48 @@ def perform_linear_regression(preprocessed_data):
 
     plot_actual_vs_predicted(y_test, yh, "aveOralM", "Results")
 
-    print(calculate_variance_inflation_factor(preprocessed_data))
+    # print(calculate_variance_inflation_factor(preprocessed_data))
+    print(f"Mean Absolute Error: {np.mean(np.abs(y_test - yh))}")
+
+    mse = np.mean((y_test - yh) ** 2)
+    print(f"Mean Squared Error: {mse}")
+
+    r_squared = 1 - (
+        np.sum((y_test - yh) ** 2) / np.sum((y_test - np.mean(y_test)) ** 2)
+    )
+    print(f"R-squared: {r_squared}")
+
+    n = len(y_test)  # Number of observations
+    p = x_test.shape[1]  # Number of predictors
+    adjusted_r_squared = 1 - (1 - r_squared) * (n - 1) / (n - p - 1)
+    print(f"Adjusted R-squared: {adjusted_r_squared}")
+
+    plot_residual(y_test, yh, "Results")
+    plot_residual_distribution(y_test, yh, "Results")
+
+
+def perform_MBS_linear_regression(preprocessed_data):
+    x_train, x_test, y_train, y_test = split_data(preprocessed_data, "aveOralM")
+    x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
+
+    lr = MiniBatchStochasticLinearRegression(batch_size=32)
+    lr.fit(x_train_scaled, y_train)
+    yh = lr.predict(x_test_scaled)
+
+    plot_actual_vs_predicted(
+        y_test, yh, "aveOralM", "Results", "miniBatchLinearRegression"
+    )
 
 
 def main():
     df = fetch_Data()
+
+    plot_correlation_matrix(df, "Results", "Infrared_Thermography_Correlation_Matrix")
+
+    plot_variance_inflation_factor(df, "Diabetes_binary", "Results")
     perform_linear_regression(df)
+
+    # perform_MBS_linear_regression(df)
     perform_plotting(df)
 
 

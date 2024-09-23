@@ -122,7 +122,13 @@ def scale_data(x_train_data, x_test_data):
     return x_train_data_scaled, x_test_data_scaled
 
 
-def plot_actual_vs_predicted(y_test, y_hat, target_name, output_folder):
+def plot_actual_vs_predicted(
+    y_test,
+    y_hat,
+    target_name,
+    output_folder,
+    filename="Graph_Actual_vs_Predicted Value_Linear_Regression.png",
+):
     plt.figure(figsize=(10, 6))
 
     plt.scatter(
@@ -147,9 +153,34 @@ def plot_actual_vs_predicted(y_test, y_hat, target_name, output_folder):
 
     plt.legend()
 
-    plot_path = os.path.join(
-        output_folder, f"Graph_Actual_vs_Predicted Value_Linear_Regression.png"
-    )
+    plot_path = os.path.join(output_folder, filename)
+    plt.savefig(plot_path)
+    plt.close()
+
+
+def plot_residual(y_test, yh, output_folder="Results", filename="Residual.png"):
+    residuals = y_test - yh
+    plt.scatter(yh, residuals)
+    plt.axhline(y=0, color="r", linestyle="--")
+    plt.title("Residuals vs Predicted")
+    plt.xlabel("Predicted values")
+    plt.ylabel("Residuals")
+
+    plot_path = os.path.join(output_folder, filename)
+    plt.savefig(plot_path)
+    plt.close()
+
+
+def plot_residual_distribution(
+    y_test, yh, output_folder="Results", filename="Residual_Distribution.png"
+):
+    residuals = y_test - yh
+    plt.hist(residuals, bins=30)
+    plt.title("Histogram of Residuals")
+    plt.xlabel("Residuals")
+    plt.ylabel("Frequency")
+
+    plot_path = os.path.join(output_folder, filename)
     plt.savefig(plot_path)
     plt.close()
 
@@ -157,7 +188,7 @@ def plot_actual_vs_predicted(y_test, y_hat, target_name, output_folder):
 def plot_correlation_matrix(X, output_folder="Results", title="Correlation Matrix"):
     plt.figure(figsize=(20, 20))
     heatmap = sns.heatmap(X.corr(), vmin=-1, vmax=1, annot=True, cmap="Blues")
-    heatmap.set_title("CDC Data Correlation heatmap", fontdict={"fontsize": 10}, pad=12)
+    heatmap.set_title("Correlation heatmap", fontdict={"fontsize": 10}, pad=12)
     plot_path = os.path.join(output_folder, title)
     plt.savefig(plot_path)
     plt.close()

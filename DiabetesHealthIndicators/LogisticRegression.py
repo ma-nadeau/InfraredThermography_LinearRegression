@@ -35,16 +35,10 @@ class LogisticRegression:
             self.weights = self.weights - self.learning_rate * grad
             i += 1
 
-    def predict_bool(self, x):
+    def predict(self, x):
         if self.add_bias:
             x = np.c_[np.ones((x.shape[0], 1)), x]
         linear_model = np.dot(x, self.weights)
-        yh = sigmoid(linear_model)
-        return (yh > 0.5).astype(int)
-
-    def predict_real(self, x):
-        if self.add_bias:
-            x = np.c_[np.ones((x.shape[0], 1)), x]
-        linear_model = np.dot(x, self.weights)
-        yh = sigmoid(linear_model)
-        return yh
+        yh_real = sigmoid(linear_model)
+        yh_bool = (yh_real > 0.5).astype(int)
+        return yh_bool, yh_real

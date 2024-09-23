@@ -17,10 +17,10 @@ def perform_logistic_regression(preprocessed_data):
 
     x_train, x_test, y_train, y_test = split_data(preprocessed_data, "Diabetes_binary")
     x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
-    lr = LogisticRegression(0.01, 10000, 1e-8, True)
+    lr = LogisticRegression(0.05, 1000, 1e-8, True)
     lr.fit(x_train_scaled, y_train)
-    yh_bool = lr.predict_bool(x_test_scaled)
-    yh_real = lr.predict_real(x_test_scaled)
+    yh_bool, yh_real = lr.predict(x_test_scaled)
+
     # Plot confusion matrix
     plot_confusion_matrix(y_test, yh_bool)
 
