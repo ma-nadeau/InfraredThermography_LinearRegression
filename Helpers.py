@@ -287,7 +287,7 @@ def plot_roc_curve(y_true, y_hat, output_folder="Results", title="ROC_Curve"):
     plt.close()
 
 
-def oversampling_dataset(df, target, test_size=0.2, random_state=None):
+def undersampling_dataset(df, target, test_size=0.2, random_state=None):
 
     positive = df[df[target] == 1]  # Extract all the true features in the dataset
     negative = df[df[target] == 0]  # Extract all the false features in the dataset
@@ -298,6 +298,23 @@ def oversampling_dataset(df, target, test_size=0.2, random_state=None):
 
     x_train, x_test, y_train, y_test = split_data(
         df, target, test_size=test_size, random_state=None
+    )
+
+    return x_train, x_test, y_train, y_test
+
+
+def oversampling_dataset(df, target, test_size=0.2, random_state=None):
+    positive = df[df[target] == 1]  # Extract all the true features in the dataset
+    negative = df[df[target] == 0]  # Extract all the false features in the dataset
+
+    # Sample with replacement from the positive examples to match the number of negatives
+    positive_sample = positive.sample(
+        n=len(negative), replace=True, random_state=random_state
+    )
+    df = pd.concat([negative, positive_sample])
+
+    x_train, x_test, y_train, y_test = split_data(
+        df, target, test_size=test_size, random_state=random_state
     )
 
     return x_train, x_test, y_train, y_test

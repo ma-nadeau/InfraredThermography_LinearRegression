@@ -7,13 +7,16 @@ def sigmoid(z):
 
 
 class LogisticRegression:
-    def __init__(self, learning_rate=0.01, max_iter=1000, epsilon=1e-8, add_bias=True):
+    def __init__(
+        self, learning_rate=0.01, max_iter=1000, epsilon=1e-8, add_bias=True, epochs=10
+    ):
         self.weights = None
         self.bias = None
         self.learning_rate = learning_rate
         self.max_iter = max_iter
         self.epsilon = epsilon
         self.add_bias = add_bias
+        self.epochs = epochs
 
     def gradient(self, x, y):
         n_samples, n_features = x.shape
@@ -30,10 +33,12 @@ class LogisticRegression:
         self.weights = np.zeros(n_features)
         grad = np.inf
         i = 0
-        while np.linalg.norm(grad) > self.epsilon and i < self.max_iter:
-            grad = self.gradient(x, y)
-            self.weights = self.weights - self.learning_rate * grad
-            i += 1
+        for e in range(self.epochs):
+            while np.linalg.norm(grad) > self.epsilon and i < self.max_iter:
+                grad = self.gradient(x, y)
+                self.weights = self.weights - self.learning_rate * grad
+                i += 1
+            print(f"Epoch {e + 1}/{self.epochs} completed")
 
     def predict(self, x):
         if self.add_bias:

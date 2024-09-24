@@ -22,17 +22,22 @@ def perform_logistic_regression(preprocessed_data):
 
     preprocessed_data.dropna(inplace=True)
     preprocessed_data.drop(columns=["ID"], inplace=True)
+    preprocessed_data.drop(
+        columns=["Fruits", "Veggies", "AnyHealthcare", "NoDocbcCost", "Sex"],
+        inplace=True,
+    )
     preprocessed_data.drop_duplicates(inplace=True)
 
     x_train, x_test, y_train, y_test = oversampling_dataset(
         preprocessed_data, "Diabetes_binary"
     )
-    # x_train, x_test, y_train, y_test = split_data(preprocessed_data, "Diabetes_binary")
-    x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
-    lr = LogisticRegression(0.01, 1000, 1e-8, True)
-    lr.fit(x_train_scaled, y_train)
-    yh_bool, yh_real = lr.predict(x_test_scaled)
+    # x_train, x_test, y_train, y_test = split_data(preprocessed_data, "Diabetes_binary")
+    # x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
+
+    lr = LogisticRegression(0.005, 1000, 1e-6, True, 10)
+    lr.fit(x_train, y_train)
+    yh_bool, yh_real = lr.predict(x_test)
 
     plot_residual(y_test, yh_bool, "Results")
     plot_residual_distribution(y_test, yh_bool, "Results")

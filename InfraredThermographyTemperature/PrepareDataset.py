@@ -88,7 +88,13 @@ def perform_linear_regression(preprocessed_data):
     )
     x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
-    lr = LinearRegression()
+    # lr = LinearRegression()
+    # lr.fit(x_train_scaled, y_train)
+    # yh = lr.predict(x_test_scaled)
+
+    lr = MiniBatchStochasticLinearRegression(
+        learning_rate=0.005, max_iter=1000, epsilon=1e-6, epoch=100, batch_size=1
+    )
     lr.fit(x_train_scaled, y_train)
     yh = lr.predict(x_test_scaled)
 
