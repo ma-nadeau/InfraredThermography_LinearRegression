@@ -83,7 +83,9 @@ def fetch_Data():
 
 
 def perform_linear_regression(preprocessed_data):
-    x_train, x_test, y_train, y_test = split_data(preprocessed_data, "aveOralM")
+    x_train, x_test, y_train, y_test = split_data(
+        preprocessed_data, "aveOralM", test_size=0.3, random_state=42
+    )
     x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
     lr = LinearRegression()
@@ -92,28 +94,15 @@ def perform_linear_regression(preprocessed_data):
 
     plot_actual_vs_predicted(y_test, yh, "aveOralM", "Results")
 
-    # print(calculate_variance_inflation_factor(preprocessed_data))
-    print(f"Mean Absolute Error: {np.mean(np.abs(y_test - yh))}")
-
-    mse = np.mean((y_test - yh) ** 2)
-    print(f"Mean Squared Error: {mse}")
-
-    r_squared = 1 - (
-        np.sum((y_test - yh) ** 2) / np.sum((y_test - np.mean(y_test)) ** 2)
-    )
-    print(f"R-squared: {r_squared}")
-
-    n = len(y_test)  # Number of observations
-    p = x_test.shape[1]  # Number of predictors
-    adjusted_r_squared = 1 - (1 - r_squared) * (n - 1) / (n - p - 1)
-    print(f"Adjusted R-squared: {adjusted_r_squared}")
-
+    print_linear_regression_model_stats(x_test, y_test, yh)
     plot_residual(y_test, yh, "Results")
     plot_residual_distribution(y_test, yh, "Results")
 
 
 def perform_MBS_linear_regression(preprocessed_data):
-    x_train, x_test, y_train, y_test = split_data(preprocessed_data, "aveOralM")
+    x_train, x_test, y_train, y_test = split_data(
+        preprocessed_data, "aveOralM", test_size=0.3, random_state=42
+    )
     x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
     lr = MiniBatchStochasticLinearRegression(batch_size=32)
@@ -124,13 +113,61 @@ def perform_MBS_linear_regression(preprocessed_data):
         y_test, yh, "aveOralM", "Results", "miniBatchLinearRegression"
     )
 
+    print_linear_regression_model_stats(x_test, y_test, yh)
+
+    plot_residual(y_test, yh, "Results", "Mini_Batch_Linear_Regression_Residual.png")
+
+    plot_residual_distribution(
+        y_test, yh, "Results", "Mini_Batch_Linear_Regression_Residual_Distribution.png"
+    )
+
 
 def main():
     df = fetch_Data()
 
-    plot_correlation_matrix(df, "Results", "Infrared_Thermography_Correlation_Matrix")
+    plot_correlation_matrix(
+        df,
+        "Results",
+        "Infrared_Thermography_Correlation_Matrix_Before_Dropping_Values.png",
+    )
+    print("\nTest without dropping values:")
+    perform_linear_regression(df)
+
+    columns_to_drop = [
+        "T_RC_Dry1",
+        "T_RC_Wet1",
+        "T_RC_Max1",
+        "T_LC_Dry1",
+        "T_LC_Wet1",
+        "T_LC_Max1",
+        "canthi4Max1",
+        "T_FHRC1",
+        "T_FHLC1",
+        "T_FHBC1",
+        "T_FHTC1",
+        "T_OR1",
+        "T_Max1",
+        "T_FH_Max1",
+        "T_FHC_Max1",
+        "LCC1",
+        "canthiMax1",
+        "Max1R13_1",
+        "aveAllL13_1",
+        "T_RC1",
+        "T_LC1",
+        "RCC1",
+    ]
+    df.drop(columns_to_drop, axis=1, inplace=True)
+
+    plot_correlation_matrix(
+        df,
+        "Results",
+        "Infrared_Thermography_Correlation_Matrix_After_Dropping_Values.png",
+    )
 
     plot_variance_inflation_factor(df, "Diabetes_binary", "Results")
+
+    print("\nTest after dropping values:")
     perform_linear_regression(df)
 
     # perform_MBS_linear_regression(df)

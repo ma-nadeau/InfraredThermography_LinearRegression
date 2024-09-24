@@ -2,6 +2,14 @@ import pandas as pd
 import numpy as np
 from LogisticRegression import *
 from Assignment1.Helpers import *
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    roc_auc_score,
+    confusion_matrix,
+)
 
 # Not much data to be pre-processed here.
 
@@ -12,17 +20,26 @@ def fetch_data():
 
 def perform_logistic_regression(preprocessed_data):
 
-    preprocessed_data = preprocessed_data.dropna()
-    preprocessed_data = preprocessed_data.drop(columns=["ID"])
+    preprocessed_data.dropna(inplace=True)
+    preprocessed_data.drop(columns=["ID"], inplace=True)
+    preprocessed_data.drop_duplicates(inplace=True)
 
-    x_train, x_test, y_train, y_test = split_data(preprocessed_data, "Diabetes_binary")
+    x_train, x_test, y_train, y_test = oversampling_dataset(
+        preprocessed_data, "Diabetes_binary"
+    )
+    # x_train, x_test, y_train, y_test = split_data(preprocessed_data, "Diabetes_binary")
     x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
-    lr = LogisticRegression(0.05, 1000, 1e-8, True)
+
+    lr = LogisticRegression(0.01, 1000, 1e-8, True)
     lr.fit(x_train_scaled, y_train)
     yh_bool, yh_real = lr.predict(x_test_scaled)
 
+    plot_residual(y_test, yh_bool, "Results")
+    plot_residual_distribution(y_test, yh_bool, "Results")
     # Plot confusion matrix
     plot_confusion_matrix(y_test, yh_bool)
+
+    print_logistic_regression_model_stats(x_test, y_test, yh_bool)
 
     # Plot ROC curve
     plot_roc_curve(y_test, yh_real)
