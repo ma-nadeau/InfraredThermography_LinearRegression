@@ -34,7 +34,6 @@ def perform_logistic_regression(preprocessed_data):
     lr.fit(x_train_scaled, y_train)
     yh_bool, yh_real = lr.predict(x_test_scaled)
 
-
     plot_residual(y_test, yh_bool, "Results")
     plot_residual_distribution(y_test, yh_bool, "Results")
     # Plot confusion matrix
