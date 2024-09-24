@@ -185,6 +185,50 @@ def plot_residual_distribution(
     plt.close()
 
 
+def print_linear_regression_model_stats(x_test, y_test, yh):
+    # print(calculate_variance_inflation_factor(preprocessed_data))
+    print(f"Mean Absolute Error: {np.mean(np.abs(y_test - yh))}")
+
+    mse = np.mean((y_test - yh) ** 2)
+    print(f"Mean Squared Error: {mse}")
+
+    r_squared = 1 - (
+        np.sum((y_test - yh) ** 2) / np.sum((y_test - np.mean(y_test)) ** 2)
+    )
+    print(f"R-squared: {r_squared}")
+
+    n = len(y_test)  # Number of observations
+    p = x_test.shape[1]  # Number of predictors
+    adjusted_r_squared = 1 - (1 - r_squared) * (n - 1) / (n - p - 1)
+    print(f"Adjusted R-squared: {adjusted_r_squared}")
+
+
+def print_logistic_regression_model_stats(x_test, y_test, yh):
+    # Accuracy
+    accuracy = np.mean(y_test == yh)
+
+    # Precision
+    true_positives = np.sum((yh == 1) & (y_test == 1))
+    predicted_positives = np.sum(yh == 1)
+    precision = true_positives / predicted_positives if predicted_positives > 0 else 0
+
+    # Recall
+    actual_positives = np.sum(y_test == 1)
+    recall = true_positives / actual_positives if actual_positives > 0 else 0
+
+    # F1 Score
+    if precision + recall > 0:
+        f1 = 2 * (precision * recall) / (precision + recall)
+    else:
+        f1 = 0
+
+    print(f"Model Statistics:")
+    print(f"Accuracy: {accuracy:.4f}")
+    print(f"Precision: {precision:.4f}")
+    print(f"Recall: {recall:.4f}")
+    print(f"F1 Score: {f1:.4f}")
+
+
 def plot_correlation_matrix(X, output_folder="Results", title="Correlation Matrix"):
     plt.figure(figsize=(20, 20))
     heatmap = sns.heatmap(X.corr(), vmin=-1, vmax=1, annot=True, cmap="Blues")
@@ -240,3 +284,43 @@ def plot_roc_curve(y_true, y_hat, output_folder="Results", title="ROC_Curve"):
     plot_path = os.path.join(output_folder, f"{title}.png")
     plt.savefig(plot_path)
     plt.close()
+
+
+def oversampling_dataset(df, target, test_percentage_dataset=0.2, random_state=None):
+    rng = np.random.RandomState(random_state)
+
+    positive = df[df[target] == 1]  # Extract all the true features in the dataset
+    negative = df[df[target] == 0]  # Extract all the false features in the dataset
+
+    train_percentage_dataset = 1 - test_percentage_dataset
+
+    # Split positive examples into train and test
+    positive_train = positive.sample(frac=train_percentage_dataset, random_state=rng)
+    positive_test = positive.drop(positive_train.index)
+
+    # Select an equal number of negative examples as positive_train for training
+    negative_train = negative.sample(n=len(positive_train), random_state=rng)
+    negative_test = negative.drop(negative_train.index).sample(
+        n=len(positive_test), random_state=rng
+    )
+
+    # Perform oversampling on the positive training set to match the size of the negative training set
+    oversampled_positive_train = positive_train.sample(
+        n=len(negative_train), replace=True, random_state=rng
+    )
+
+    # Combine the oversampled positive samples with the negative samples
+    x_train = pd.concat([oversampled_positive_train, negative_train]).sample(
+        frac=1, random_state=rng
+    )
+    x_test = pd.concat([positive_test, negative_test]).sample(frac=1, random_state=rng)
+
+    # Extract the target column
+    y_train = x_train[target]
+    y_test = x_test[target]
+
+    # Drop the target column from x_train and x_test to get only features
+    x_train = x_train.drop(columns=[target])
+    x_test = x_test.drop(columns=[target])
+
+    return x_train, x_test, y_train, y_test
