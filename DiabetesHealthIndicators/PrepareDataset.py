@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from LogisticRegression import *
+from MiniBatchLogisticRegression import *
 from Assignment1.Helpers import *
 from sklearn.metrics import (
     accuracy_score,
@@ -35,7 +36,7 @@ def perform_logistic_regression(preprocessed_data):
     # x_train, x_test, y_train, y_test = split_data(preprocessed_data, "Diabetes_binary")
     # x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
-    lr = LogisticRegression(0.005, 1000, 1e-6, True, 10)
+    lr = MiniBatchLogisticRegression(0.005, 1000, 1e-6, 32, 100)
     lr.fit(x_train, y_train)
     yh_bool, yh_real = lr.predict(x_test)
 

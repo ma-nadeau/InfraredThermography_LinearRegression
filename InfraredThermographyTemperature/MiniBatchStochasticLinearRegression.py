@@ -39,7 +39,7 @@ class MiniBatchStochasticLinearRegression:
 
             x_rand, y_rand = (
                 x[rand_index],
-                y.iloc[rand_index],
+                y[rand_index],
             )  # Obtain the two corresponding sample and result
 
             grad = self.gradient(x_rand, y_rand)
@@ -56,8 +56,9 @@ class MiniBatchStochasticLinearRegression:
         self.weights = np.zeros(n_features)
 
         for e in range(self.epoch):
-
-            self.stochastic_gradient_descent(x, y)
+            mini_batches = self.create_array_minibatch(x, y)
+            for x_batch, y_batch in mini_batches:
+                self.stochastic_gradient_descent(x_batch, y_batch)
 
     def predict(self, x):
         if self.bias:
@@ -66,6 +67,7 @@ class MiniBatchStochasticLinearRegression:
         return yh
 
     def create_array_minibatch(self, x, y):
-        n_samples, n_features = x.shape
-
-        # for i in range(0, n_samples, self.batch_size)
+        matrix = np.c_[x, y]
+        np.random.shuffle(matrix)
+        mini_batches = np.array_split(matrix, self.batch_size)
+        return [(batch[:, :-1], batch[:, -1]) for batch in mini_batches]
