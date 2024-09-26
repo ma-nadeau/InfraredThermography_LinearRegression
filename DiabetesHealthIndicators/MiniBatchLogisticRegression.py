@@ -49,3 +49,12 @@ class MiniBatchLogisticRegression:
                 adaptive_moment_estimation(self.weights, grad, self.m, self.v, self.t, self.learning_rate, self.beta1,
                                            self.beta2, self.epsilon)  # Use Adam for weight updates (Modified)
 
+    def predict(self, x):
+        if self.add_bias:
+            x = np.c_[np.ones((x.shape[0], 1)), x]
+        linear_model = np.dot(x, self.weights)
+        yh_real = sigmoid(linear_model)
+        yh_bool = (yh_real > 0.5).astype(int)
+        return yh_bool, yh_real
+
+
