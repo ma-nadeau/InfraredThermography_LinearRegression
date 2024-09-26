@@ -1,14 +1,10 @@
 import numpy as np
-
-
-def sigmoid(z):
-    logistic = 1.0 / (1 + np.exp(-z))
-    return logistic
+from Assignment1.Helpers import sigmoid
 
 
 class LogisticRegression:
     def __init__(
-        self, learning_rate=0.01, max_iter=1000, epsilon=1e-8, add_bias=True, epochs=10
+            self, learning_rate=0.01, max_iter=1000, epsilon=1e-8, add_bias=True, epochs=10
     ):
         self.weights = None
         self.bias = None
@@ -22,7 +18,7 @@ class LogisticRegression:
         n_samples, n_features = x.shape
         yh = sigmoid(np.dot(x, self.weights))
         grad = (
-            np.dot(x.T, yh - y) / n_samples
+                np.dot(x.T, yh - y) / n_samples
         )  # divide by N because cost is mean over N points
         return grad  # size n_features
 
@@ -32,13 +28,12 @@ class LogisticRegression:
         n_samples, n_features = x.shape
         self.weights = np.zeros(n_features)
         grad = np.inf
-        i = 0
         for e in range(self.epochs):
+            i = 0
             while np.linalg.norm(grad) > self.epsilon and i < self.max_iter:
                 grad = self.gradient(x, y)
                 self.weights = self.weights - self.learning_rate * grad
                 i += 1
-            print(f"Epoch {e + 1}/{self.epochs} completed")
 
     def predict(self, x):
         if self.add_bias:

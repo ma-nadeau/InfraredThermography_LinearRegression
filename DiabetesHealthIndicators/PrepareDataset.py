@@ -1,76 +1,86 @@
-import pandas as pd
-import numpy as np
 from LogisticRegression import *
 from MiniBatchLogisticRegression import *
 from Assignment1.Helpers import *
-from sklearn.metrics import (
-    accuracy_score,
-    precision_score,
-    recall_score,
-    f1_score,
-    roc_auc_score,
-    confusion_matrix,
-)
-
-# Not much data to be pre-processed here.
 
 
-def fetch_data():
-    return pd.read_csv("Data/DiabetesHealthIndicators.csv")
+def preprocess_diabetes_data(file_name):
+    # Load the thermography dataset into a Pandas dataframe.
+    df_diabetes = pd.read_csv(file_name)
 
+    # Remove ID column.
+    df_diabetes.drop(columns=["ID"], inplace=True)
 
-def perform_logistic_regression(preprocessed_data):
+    # Remove duplicates.
+    df_diabetes.drop_duplicates(inplace=True)
 
-    preprocessed_data.dropna(inplace=True)
-    preprocessed_data.drop(columns=["ID"], inplace=True)
-    preprocessed_data.drop(
+    # Remove rows with empty values.
+    # Explain choice in report.
+    df_diabetes.dropna(inplace=True)
+
+    # Dropping these columns does not have a significant effect on outcome.
+    # Keep for report.
+    df_diabetes.drop(
         columns=["Fruits", "Veggies", "AnyHealthcare", "NoDocbcCost", "Sex"],
         inplace=True,
     )
-    preprocessed_data.drop_duplicates(inplace=True)
+    return df_diabetes
 
+
+def run_regression_tests(df, label, regression_type="standard"):
+    print(f"\n{label}:")
+
+    if regression_type == "mini_batch":
+        perform_logistic_regression(df, model_type="mini_batch", batch_size=32)
+    else:
+        perform_logistic_regression(df)
+
+
+def perform_logistic_regression(df, target_variable="Diabetes_binary", model_type="standard", batch_size=None):
     x_train, x_test, y_train, y_test = oversampling_dataset(
-        preprocessed_data, "Diabetes_binary"
+        df, target_variable
     )
 
-    # x_train, x_test, y_train, y_test = split_data(preprocessed_data, "Diabetes_binary")
-    # x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
+    x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
-    lr = MiniBatchLogisticRegression(0.005, 1000, 1e-6, 32, 100)
-    lr.fit(x_train, y_train)
-    yh_bool, yh_real = lr.predict(x_test)
+    if model_type == "mini_batch":
+        lr = MiniBatchLogisticRegression(batch_size)
+        model_name = "Mini_Batch_Logistic_Regression"
+    else:
+        lr = LogisticRegression()
+        model_name = "Logistic_Regression"
 
-    plot_residual(y_test, yh_bool, "Results")
-    plot_residual_distribution(y_test, yh_bool, "Results")
-    # Plot confusion matrix
+    lr.fit(x_train_scaled, y_train)
+    yh_bool, yh_real = lr.predict(x_test_scaled)
+
+    plot_residual(y_test, yh_bool, "Results", f"{model_name}_Residual.png")
+    plot_residual_distribution(y_test, yh_bool, "Results", f"{model_name}_Residual_Distribution.png")
+
+    # Plot confusion matrix.
     plot_confusion_matrix(y_test, yh_bool)
 
-    print_logistic_regression_model_stats(x_test, y_test, yh_bool)
+    # Plot statistics.
+    print_logistic_regression_model_stats(x_test_scaled, y_test, yh_bool)
 
-    # Plot ROC curve
+    # Plot ROC curve.
     plot_roc_curve(y_test, yh_real)
 
 
 def main():
-    df = fetch_data()
-    # plot_histogram(df,"Results", "Histogram_Diabetes_Health_Indicators.png")
-    # compute_and_plot_correlation(df, "Diabetes_binary", "Results", "Correlation_Diabetes_Health_Indicators.png")
-    # calculate_variance_inflation_factor(df)
-    preprocessed_data = df.dropna()
-    preprocessed_data = preprocessed_data.drop(columns=["ID"])
-    plot_histogram(
-        preprocessed_data, "Results", "Histogram_Diabetes_Health_Indicators.png"
-    )
-    plot_correlation_matrix(preprocessed_data, "Results", "CDC_Correlation_Matrix")
+    df = preprocess_diabetes_data("Data/DiabetesHealthIndicators.csv")
 
-    plot_variance_inflation_factor(preprocessed_data, "Diabetes_binary", "Results")
+    # Perform regression testing for standard and mini-batch.
+    run_regression_tests(df, "Test logistic regression", regression_type="standard")
+    run_regression_tests(df, "Test mini-batch logistic regression", regression_type="mini_batch")
+
+    plot_histogram(
+        df, "Results", "Histogram_Diabetes_Health_Indicators.png"
+    )
+    plot_correlation_matrix(df, "Results", "CDC_Correlation_Matrix")
+
+    plot_variance_inflation_factor(df, "Diabetes_binary", "Results")
 
     perform_logistic_regression(df)
 
 
 if __name__ == "__main__":
     main()
-
-# Education vif = 29.72, correlation w/ target is low. Education and Income are correlated (0.44), could keep Income.
-# AnyHealthcare vif = 20.93, correlation w/ target very low (0.016).
-# ColCheck vif = 23.33, correlation w/ target low (0,064).

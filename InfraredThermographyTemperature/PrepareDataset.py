@@ -1,8 +1,7 @@
 from sklearn.preprocessing import LabelEncoder
-
 from Assignment1.Helpers import *
+from LinearRegression import LinearRegression
 from MiniBatchStochasticLinearRegression import *
-from LinearRegression import *
 
 
 def preprocess_thermography_data(file_name):
@@ -12,9 +11,11 @@ def preprocess_thermography_data(file_name):
     # Initialize encoder and scaler.
     label_encoder = LabelEncoder()
 
-    # Remove SubjectID column once validated for no duplicates.
-    df_thermography = df_thermography.drop_duplicates(subset="SubjectID", keep="first")
-    df_thermography = df_thermography.drop("SubjectID", axis=1)
+    # Remove SubjectID column.
+    df_thermography.drop("SubjectID", axis=1, inplace=True)
+
+    # Remove duplicates.
+    df_thermography.drop_duplicates(inplace=True)
 
     # Obtain midpoint value for integers in ranges.
     def get_midpoint(age_range):
@@ -63,82 +64,67 @@ def preprocess_thermography_data(file_name):
     return df_thermography
 
 
-def perform_plotting(df_thermography):
-
+def plot_histogram_correlation(df):
     plot_histogram(
-        df_thermography,
+        df,
         "Results",
         "Histogram_Infrared_Thermography_Temperature.png",
     )
     compute_and_plot_correlation(
-        df_thermography,
+        df,
         "aveOralM",
         "Results",
         "Correlation_Infrared_Thermography_Temperature.png",
     )
 
 
-def fetch_Data():
-    return preprocess_thermography_data("Data/InfraredThermographyTemperature.csv")
-
-
-def perform_linear_regression(preprocessed_data):
+def perform_linear_regression(
+        df, target_variable="aveOralM", model_type="standard", batch_size=None
+):
     x_train, x_test, y_train, y_test = split_data(
-        preprocessed_data, "aveOralM", test_size=0.3, random_state=42
+        df, target_variable, test_size=0.3, random_state=42
     )
     x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
-    # lr = LinearRegression()
-    # lr.fit(x_train_scaled, y_train)
-    # yh = lr.predict(x_test_scaled)
+    if model_type == "mini_batch":
+        lr = MiniBatchStochasticLinearRegression(batch_size=batch_size)
+        model_name = "Mini_Batch_Linear_Regression"
+    else:
+        lr = LinearRegression()
+        model_name = "Linear_Regression"
 
-    lr = MiniBatchStochasticLinearRegression(
-        learning_rate=0.005, max_iter=1000, epsilon=1e-6, epoch=100, batch_size=32
-    )
     lr.fit(x_train_scaled, y_train)
     yh = lr.predict(x_test_scaled)
 
-    plot_actual_vs_predicted(y_test, yh, "aveOralM", "Results")
-
+    plot_actual_vs_predicted(y_test, yh, target_variable, "Results", model_name)
     print_linear_regression_model_stats(x_test, y_test, yh)
-    plot_residual(y_test, yh, "Results")
-    plot_residual_distribution(y_test, yh, "Results")
+    plot_residual(y_test, yh, "Results", f"{model_name}_Residual.png")
+    plot_residual_distribution(y_test, yh, "Results", f"{model_name}_Residual_Distribution.png")
 
 
-def perform_MBS_linear_regression(preprocessed_data):
-    x_train, x_test, y_train, y_test = split_data(
-        preprocessed_data, "aveOralM", test_size=0.3, random_state=42
-    )
-    x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
+def run_regression_tests(df, label, regression_type="standard"):
+    print(f"\n{label}:")
 
-    lr = MiniBatchStochasticLinearRegression(batch_size=32)
-    lr.fit(x_train_scaled, y_train)
-    yh = lr.predict(x_test_scaled)
-
-    plot_actual_vs_predicted(
-        y_test, yh, "aveOralM", "Results", "miniBatchLinearRegression"
-    )
-
-    print_linear_regression_model_stats(x_test, y_test, yh)
-
-    plot_residual(y_test, yh, "Results", "Mini_Batch_Linear_Regression_Residual.png")
-
-    plot_residual_distribution(
-        y_test, yh, "Results", "Mini_Batch_Linear_Regression_Residual_Distribution.png"
-    )
+    if regression_type == "mini_batch":
+        perform_linear_regression(df, model_type="mini_batch", batch_size=32)
+    else:
+        perform_linear_regression(df)
 
 
 def main():
-    df = fetch_Data()
+    df = preprocess_thermography_data("Data/InfraredThermographyTemperature.csv")
 
+    # Perform tests before dropping values, both for standard and mini-batch.
+    run_regression_tests(df, "Test without dropping columns, analytical regression", regression_type="standard")
+    run_regression_tests(df, "Test without dropping columns, mini-batch regression", regression_type="mini_batch")
+
+    # Plot initial correlation matrix before dropping columns.
     plot_correlation_matrix(
         df,
         "Results",
         "Infrared_Thermography_Correlation_Matrix_Before_Dropping_Values.png",
     )
-    print("\nTest without dropping values:")
-    perform_linear_regression(df)
-
+    # Columns to drop according to correlation matrix.
     columns_to_drop = [
         "T_RC_Dry1",
         "T_RC_Wet1",
@@ -165,19 +151,18 @@ def main():
     ]
     df.drop(columns_to_drop, axis=1, inplace=True)
 
+    # Perform tests after dropping values, both for standard and mini-batch.
+    run_regression_tests(df, "Test after dropping columns, analytical regression", regression_type="standard")
+    run_regression_tests(df, "Test after dropping columns, mini-batch regression", regression_type="mini_batch")
+
+    # Plot correlation matrix after dropping columns.
     plot_correlation_matrix(
         df,
         "Results",
         "Infrared_Thermography_Correlation_Matrix_After_Dropping_Values.png",
     )
-
+    plot_histogram_correlation(df)
     plot_variance_inflation_factor(df, "Diabetes_binary", "Results")
-
-    print("\nTest after dropping values:")
-    perform_linear_regression(df)
-
-    # perform_MBS_linear_regression(df)
-    perform_plotting(df)
 
 
 if __name__ == "__main__":

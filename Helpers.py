@@ -40,7 +40,7 @@ def calculate_variance_inflation_factor(df):
 
 
 def plot_variance_inflation_factor(
-    df, target, output_folder=None, filename="variance_inflation_factor.png"
+        df, target, output_folder=None, filename="variance_inflation_factor.png"
 ):
     # Calculate the VIF for each feature
     vif = pd.DataFrame()
@@ -124,11 +124,11 @@ def scale_data(x_train_data, x_test_data):
 
 
 def plot_actual_vs_predicted(
-    y_test,
-    y_hat,
-    target_name,
-    output_folder,
-    filename="Graph_Actual_vs_Predicted Value_Linear_Regression.png",
+        y_test,
+        y_hat,
+        target_name,
+        output_folder,
+        filename="Graph_Actual_vs_Predicted Value_Linear_Regression.png",
 ):
     plt.figure(figsize=(10, 6))
 
@@ -173,7 +173,7 @@ def plot_residual(y_test, yh, output_folder="Results", filename="Residual.png"):
 
 
 def plot_residual_distribution(
-    y_test, yh, output_folder="Results", filename="Residual_Distribution.png"
+        y_test, yh, output_folder="Results", filename="Residual_Distribution.png"
 ):
     residuals = y_test - yh
     plt.hist(residuals, bins=30)
@@ -194,7 +194,7 @@ def print_linear_regression_model_stats(x_test, y_test, yh):
     print(f"Mean Squared Error: {mse}")
 
     r_squared = 1 - (
-        np.sum((y_test - yh) ** 2) / np.sum((y_test - np.mean(y_test)) ** 2)
+            np.sum((y_test - yh) ** 2) / np.sum((y_test - np.mean(y_test)) ** 2)
     )
     print(f"R-squared: {r_squared}")
 
@@ -240,7 +240,7 @@ def plot_correlation_matrix(X, output_folder="Results", title="Correlation Matri
 
 
 def plot_confusion_matrix(
-    y_true, y_hat, output_folder="Results", title="Confusion Matrix"
+        y_true, y_hat, output_folder="Results", title="Confusion Matrix"
 ):
     cm = confusion_matrix(y_true, y_hat)
     plt.figure(figsize=(6, 6))
@@ -288,7 +288,6 @@ def plot_roc_curve(y_true, y_hat, output_folder="Results", title="ROC_Curve"):
 
 
 def undersampling_dataset(df, target, test_size=0.2, random_state=None):
-
     positive = df[df[target] == 1]  # Extract all the true features in the dataset
     negative = df[df[target] == 0]  # Extract all the false features in the dataset
 
@@ -318,3 +317,66 @@ def oversampling_dataset(df, target, test_size=0.2, random_state=None):
     )
 
     return x_train, x_test, y_train, y_test
+
+
+def sigmoid(z):
+    """
+    Compute the sigmoid function for the input z.
+    """
+    return 1.0 / (1 + np.exp(-z))
+
+
+def adaptive_moment_estimation(weights, grad, m, v, t, learning_rate, beta1, beta2, epsilon):
+    """
+    Perform the Adam optimization algorithm using the computed gradient.
+    Update the weights using the moment estimates.
+    """
+    # Increment timestep
+    t += 1
+
+    # Update biased first moment estimate
+    m = beta1 * m + (1 - beta1) * grad
+
+    # Update biased second moment estimate
+    v = beta2 * v + (1 - beta2) * (grad ** 2)
+
+    # Bias correction
+    m_hat = m / (1 - beta1 ** t)
+    v_hat = v / (1 - beta2 ** t)
+
+    # Update weights
+    weights -= learning_rate * m_hat / (np.sqrt(v_hat) + epsilon)
+
+    return weights, m, v, t
+
+
+def create_array_minibatch(x, y, batch_size):
+    """
+    Create mini-batches for mini-batch gradient descent.
+    """
+    matrix = np.c_[x, y]
+    np.random.shuffle(matrix)
+    mini_batches = np.array_split(matrix, batch_size)
+    return [(batch[:, :-1], batch[:, -1]) for batch in mini_batches]
+
+
+def stochastic_gradient_descent(self, x, y):
+    """
+      Implement stochastic gradient descent.
+    """
+    n_samples, n_features = x.shape
+
+    for i in range(n_samples):  # Iterate over all the samples in the X
+        rand_index = np.random.randint(
+            n_samples
+        )  # fetch the index of random value in x
+
+        x_rand, y_rand = (
+            x[rand_index],
+            y[rand_index],
+        )  # Obtain the two corresponding sample and result
+
+        grad = self.gradient(x_rand, y_rand)
+        self.weights = self.weights - self.learning_rate * grad
+        if np.linalg.norm(grad) < self.epsilon:
+            break
