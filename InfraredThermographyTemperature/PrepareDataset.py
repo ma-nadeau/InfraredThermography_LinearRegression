@@ -77,7 +77,16 @@ def plot_histogram_correlation(df):
         "Correlation_Infrared_Thermography_Temperature.png",
     )
 
+def perform_linear_regression_test_growing_subset(
+        df, target_variable="aveOralM", model_type="standard", batch_size=None
+):
+    x_train, x_test, y_train, y_test = split_data(
+        df, target_variable, test_size=0.3, random_state=42
+    )
+    x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
+    plot_growing_subset_linear(x_train_scaled,y_train,x_test_scaled,y_test)
+    
 def perform_linear_regression(
         df, target_variable="aveOralM", model_type="standard", batch_size=None
 ):

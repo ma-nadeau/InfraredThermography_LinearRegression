@@ -1,6 +1,6 @@
 import numpy as np
 from Assignment1.Helpers import adaptive_moment_estimation, stochastic_gradient_descent, create_array_minibatch
-
+from sklearn.metrics import mean_squared_error, r2_score, explained_variance_score
 
 class MiniBatchStochasticLinearRegression:
 
@@ -49,7 +49,8 @@ class MiniBatchStochasticLinearRegression:
             x = np.c_[np.ones(x.shape[0]), x]
 
         n_samples, n_features = x.shape
-
+        losses = []
+        r2s = []
         self.weights = np.zeros(n_features)
         self.m = np.zeros(n_features)  # Initialize first moment vector
         self.v = np.zeros(n_features)  # Initialize second moment vector
@@ -64,6 +65,12 @@ class MiniBatchStochasticLinearRegression:
                     )
                 else:
                     stochastic_gradient_descent(self, x_batch, y_batch)
+            y_pred = np.dot(x, self.weights)
+            mses = mean_squared_error(y, y_pred)
+            r2 = r2_score(y, y_pred)
+            losses.append(mses)
+            r2s.append(r2)
+        return losses, r2s
 
     def predict(self, x):
         if self.bias:

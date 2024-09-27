@@ -7,7 +7,8 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 from sklearn.metrics import confusion_matrix, roc_curve, auc
 import numpy as np
 import seaborn as sns
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score ,mean_squared_error, r2_score, explained_variance_score
+
 
 
 def plot_histogram(df, output_folder=None, filename="histogram.png"):
@@ -383,3 +384,114 @@ def stochastic_gradient_descent(self, x, y):
         self.weights = self.weights - self.learning_rate * grad
         if np.linalg.norm(grad) < self.epsilon:
             break
+def plot_growing_subset_linear(X_train,y_train,X_test,y_test):
+    train_sizes = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    def evaluate_model(model, X_train, y_train, X_test, y_test):
+        """Helper function to fit the model and calculate metrics."""
+        # Fit the model
+        model.fit(X_train, y_train)
+    
+        # Make predictions
+        y_pred_train = model.predict(X_train)
+        y_pred_test = model.predict(X_test)
+    
+        # Compute MSE and R² for both train and test
+        train_mse = mean_squared_error(y_train, y_pred_train)
+        test_mse = mean_squared_error(y_test, y_pred_test)
+        train_evs = explained_variance_score(y_train, y_pred_train)
+        test_evs = explained_variance_score(y_test, y_pred_test)
+        train_r2 = r2_score(y_train, y_pred_train)
+        test_r2 = r2_score(y_test, y_pred_test)
+    
+        return train_mse, test_mse, train_r2, test_r2 , train_evs, test_evs
+    results = {
+    "lin_mse_train": [],
+    "lin_mse_test": [],
+    "lin_r2_train": [],
+    "lin_r2_test": [],
+    "lin_evs_train": [],
+    "lin_evs_test": [],
+    "mini_mse_train": [],
+    "mini_mse_test": [],
+    "mini_r2_train": [],
+    "mini_r2_test": [],
+    "mini_evs_train": [],
+    "mini_evs_test": []
+    }
+
+    for size in train_sizes:
+        # Sample a subset of the training data
+        X_train_subset = X_train.sample(frac=size, random_state=3)
+        y_train_subset = y_train.loc[X_train_subset.index]
+
+    # Analytical Linear Regression
+        analytical = LinearRegression()
+        lin_mse_train, lin_mse_test, lin_r2_train, lin_r2_test, lin_evs_train,lin_evs_test= evaluate_model(
+            analytical, X_train_subset, y_train_subset, X_test, y_test
+        )
+    
+    # Store results for analytical model
+        results["lin_mse_train"].append(lin_mse_train)
+        results["lin_mse_test"].append(lin_mse_test)
+        results["lin_r2_train"].append(lin_r2_train)
+        results["lin_r2_test"].append(lin_r2_test)
+        results["lin_evs_train"].append(lin_evs_train)
+        results["lin_evs_test"].append(lin_evs_test)
+
+    # Mini-Batch SGD Linear Regression
+        minibatch = MiniBatchStochasticLinearRegression(learning_rate=0.05, batch_size=32, epochs=1000)
+        mini_mse_train, mini_mse_test, mini_r2_train, mini_r2_test, mini_evs_train, mini_evs_test = evaluate_model(
+            minibatch, X_train_subset, y_train_subset, X_test, y_test
+        )
+    
+    # Store results for MBSGD model
+    results["mini_mse_train"].append(mini_mse_train)
+    results["mini_mse_test"].append(mini_mse_test)
+    results["mini_r2_train"].append(mini_r2_train)
+    results["mini_r2_test"].append(mini_r2_test)
+    results["mini_evs_train"].append(mini_evs_train)
+    results["mini_evs_test"].append(mini_evs_test)
+
+    # Plot MSE for both models
+    plt.figure(figsize=(10, 5))
+    plt.plot(train_sizes, results["lin_mse_train"], label="Analytical MSE Train Set", marker='o')
+    plt.plot(train_sizes, results["lin_mse_test"], label="Analytical MSE Test Set", marker='o')
+    plt.plot(train_sizes, results["mini_mse_train"], label="MBSGD MSE Train Set", marker='o')
+    plt.plot(train_sizes, results["mini_mse_test"], label="MBSGD MSE Test Set", marker='o')
+    plt.xlabel("Training Set Size")
+    plt.ylabel("Mean Squared Error")
+    plt.title("Mean Squared Error vs Training Set Size")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+    # Plot R² for both models
+    plt.figure(figsize=(10, 5))
+    plt.plot(train_sizes, results["lin_r2_train"], label="Analytical R² Train Set", marker='o')
+    plt.plot(train_sizes, results["lin_r2_test"], label="Analytical R² Test Set", marker='o')
+    plt.plot(train_sizes, results["mini_r2_train"], label="MBSGD R² Train Set", marker='o')
+    plt.plot(train_sizes, results["mini_r2_test"], label="MBSGD R² Test Set", marker='o')
+    plt.xlabel("Training Set Size")
+    plt.ylabel("R² Score")
+    plt.title("R² Score vs Training Set Size")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+    #Plot evs for both models
+    plt.figure(figsize=(10, 5))
+    plt.plot(train_sizes, results["lin_evs_train"], label="Analytical evs Train Set", marker='o')
+    plt.plot(train_sizes, results["lin_evs_test"], label="Analytical evs Test Set", marker='o')
+    plt.plot(train_sizes, results["mini_evs_train"], label="MBSGD evs Train Set", marker='o')
+    plt.plot(train_sizes, results["mini_evs_test"], label="MBSGD evs Test Set", marker='o')
+    plt.xlabel("Training Set Size")
+    plt.ylabel("Explained Variance Score")
+    plt.title("Explained Variance Score vs Training Set Size")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+    
+def linear_batch_size_test():
+    
+
+    
