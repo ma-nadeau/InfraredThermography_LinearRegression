@@ -14,8 +14,8 @@ class LinearRegression:
             optimization (boolean): A boolean indicating if optimization should be performed using ADAM.
         """
         # Add a column of 1 to X -> [1, x1, x2, ..., x_D]^T
-        X_w0 = np.c_[np.ones(X.shape[0]), X]  # c_ -> concatenates along second axis
-        self.weights = np.linalg.pinv(X_w0.T @ X_w0) @ X_w0.T @ Y
+        x_w0 = np.c_[np.ones(X.shape[0]), X]  # c_ -> concatenates along second axis
+        self.weights = np.linalg.pinv(x_w0.T @ x_w0) @ x_w0.T @ Y
 
     def predict(self, X):
         """
@@ -27,6 +27,6 @@ class LinearRegression:
             y_hat (vector): A vector containing the predicted targets
         """
         # Add a column of 1 to X -> [1, x1, x2, ..., x_D]^T
-        X_w0 = np.c_[np.ones(X.shape[0]), X]  # c_ -> concatenates along second axis
-        y_hat = X_w0 @ self.weights  # y_hat = X * w
+        x_w0 = np.c_[np.ones(X.shape[0]), X]  # c_ -> concatenates along second axis
+        y_hat = x_w0 @ self.weights  # y_hat = X * w
         return y_hat  # Returns the prediction made by our model

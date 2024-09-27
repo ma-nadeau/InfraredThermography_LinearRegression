@@ -4,7 +4,7 @@ from Assignment1.Helpers import *
 class MiniBatchLogisticRegression:
     def __init__(
             self,
-            learning_rate=0.001,
+            learning_rate=0.01,
             max_iter=1000,
             epsilon=1e-8,
             batch_size=10,
@@ -31,7 +31,7 @@ class MiniBatchLogisticRegression:
         grad = np.dot(x.T, yh - y)  # divide by N because cost is mean over N points
         return grad  # size n_features
 
-    def fit(self, x, y):
+    def fit(self, x, y, optimization=False):
         if self.add_bias:
             x = np.c_[np.ones(x.shape[0]), x]
 
@@ -44,10 +44,13 @@ class MiniBatchLogisticRegression:
         for e in range(self.epoch):
             mini_batches = create_array_minibatch(x, y, batch_size=self.batch_size)
             for x_batch, y_batch in mini_batches:
-                # stochastic_gradient_descent(self, x_batch, y_batch)
-                adaptive_moment_estimation(
-                        x_batch, y_batch, self.weights, self.m, self.v, self.t, self.learning_rate, self.beta1, self.beta2, self.epsilon, self.gradient
-                )
+                if optimization:
+                    adaptive_moment_estimation(
+                        x_batch, y_batch, self.weights, self.m, self.v, self.t, self.learning_rate, self.beta1,
+                        self.beta2, self.epsilon, self.gradient
+                    )
+                else:
+                    stochastic_gradient_descent(self, x_batch, y_batch)
 
     def predict(self, x):
         if self.add_bias:

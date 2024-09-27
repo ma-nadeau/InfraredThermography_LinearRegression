@@ -22,7 +22,7 @@ class LogisticRegression:
         )  # divide by N because cost is mean over N points
         return grad  # size n_features
 
-    def fit(self, x, y):
+    def fit(self, x, y, optimization=False):
         if self.add_bias:
             x = np.c_[np.ones((x.shape[0], 1)), x]  # Adding columns of 1 to X
         n_samples, n_features = x.shape

@@ -49,14 +49,14 @@ def perform_logistic_regression(df, target_variable="Diabetes_binary", model_typ
         lr = LogisticRegression()
         model_name = "Logistic_Regression"
 
-    lr.fit(x_train_scaled, y_train)
+    lr.fit(x_train_scaled, y_train, optimization=True)
     yh_bool, yh_real = lr.predict(x_test_scaled)
 
     plot_residual(y_test, yh_bool, "Results", f"{model_name}_Residual.png")
     plot_residual_distribution(y_test, yh_bool, "Results", f"{model_name}_Residual_Distribution.png")
 
     # Plot confusion matrix.
-    plot_confusion_matrix(y_test, yh_bool)
+    plot_confusion_matrix(y_test, yh_bool, title=f"{model_name}_Confusion_Matrix.png")
 
     # Plot statistics.
     print_logistic_regression_model_stats(x_test_scaled, y_test, yh_bool)
