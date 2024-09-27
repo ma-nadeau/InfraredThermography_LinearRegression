@@ -30,12 +30,12 @@ def run_regression_tests(df, label, regression_type="standard"):
     print(f"\n{label}:")
 
     if regression_type == "mini_batch":
-        perform_logistic_regression(df, model_type="mini_batch", batch_size=32)
+        perform_logistic_regression(df, model_type="mini_batch")
     else:
         perform_logistic_regression(df)
 
 
-def perform_logistic_regression(df, target_variable="Diabetes_binary", model_type="standard", batch_size=None):
+def perform_logistic_regression(df, target_variable="Diabetes_binary", model_type="standard"):
     x_train, x_test, y_train, y_test = oversampling_dataset(
         df, target_variable
     )
@@ -43,7 +43,7 @@ def perform_logistic_regression(df, target_variable="Diabetes_binary", model_typ
     x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
     if model_type == "mini_batch":
-        lr = MiniBatchLogisticRegression(batch_size)
+        lr = MiniBatchLogisticRegression()
         model_name = "Mini_Batch_Logistic_Regression"
     else:
         lr = LogisticRegression()
@@ -78,8 +78,6 @@ def main():
     plot_correlation_matrix(df, "Results", "CDC_Correlation_Matrix")
 
     plot_variance_inflation_factor(df, "Diabetes_binary", "Results")
-
-    perform_logistic_regression(df)
 
 
 if __name__ == "__main__":
