@@ -5,12 +5,13 @@ class LinearRegression:
     def __init__(self):
         self.weights = None
 
-    def fit(self, X, Y):
+    def fit(self, X, Y, optimization=False):
         """From the matrix X and vector Y, fit computes the weights for the linear regression
 
         Args:
             X (Matrix): A matrix containing the features
             Y (Vector): A vector containing the target (aveOralM)
+            optimization (boolean): A boolean indicating if optimization should be performed using ADAM.
         """
         # Add a column of 1 to X -> [1, x1, x2, ..., x_D]^T
         X_w0 = np.c_[np.ones(X.shape[0]), X]  # c_ -> concatenates along second axis

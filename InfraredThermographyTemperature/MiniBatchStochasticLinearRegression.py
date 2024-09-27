@@ -1,4 +1,5 @@
 import numpy as np
+from Assignment1.Helpers import adaptive_moment_estimation, stochastic_gradient_descent, create_array_minibatch
 
 
 class MiniBatchStochasticLinearRegression:
@@ -43,28 +44,7 @@ class MiniBatchStochasticLinearRegression:
 
         return grad  # size n_features
 
-    def adaptive_moment_estimation(self, x_batch, y_batch):
-        n_samples = x_batch.shape[0]
-
-        for i in range(n_samples):  # Iterate over mini-batch
-            rand_index = np.random.randint(n_samples)
-            x_rand, y_rand = x_batch[rand_index], y_batch[rand_index]
-
-            grad = self.gradient(x_rand, y_rand)  # Calculate gradient
-            self.t += 1  # Increment time step
-
-            # Update biased first and second moment estimates
-            self.m = self.beta1 * self.m + (1 - self.beta1) * grad
-            self.v = self.beta2 * self.v + (1 - self.beta2) * (grad ** 2)
-
-            # Bias-corrected moment estimates
-            m_hat = self.m / (1 - self.beta1 ** self.t)
-            v_hat = self.v / (1 - self.beta2 ** self.t)
-
-            # Update weights using Adam's update rule
-            self.weights = self.weights - self.learning_rate * m_hat / (np.sqrt(v_hat) + self.adam_epsilon)
-
-    def fit(self, x, y):
+    def fit(self, x, y, optimization=False):
         if self.bias:
             x = np.c_[np.ones(x.shape[0]), x]
 
@@ -75,19 +55,18 @@ class MiniBatchStochasticLinearRegression:
         self.v = np.zeros(n_features)  # Initialize second moment vector
 
         for e in range(self.epoch):
-            mini_batches = self.create_array_minibatch(x, y)
+            mini_batches = create_array_minibatch(x, y, batch_size=self.batch_size)
             for x_batch, y_batch in mini_batches:
-                # self.stochastic_gradient_descent(x_batch, y_batch)
-                self.adaptive_moment_estimation(x_batch, y_batch)
+                if optimization:
+                    adaptive_moment_estimation(
+                        x_batch, y_batch, self.weights, self.m, self.v, self.t, self.learning_rate, self.beta1, self.beta2,
+                        self.epsilon, self.gradient
+                    )
+                else:
+                    stochastic_gradient_descent(self, x_batch, y_batch)
 
     def predict(self, x):
         if self.bias:
             x = np.c_[np.ones(x.shape[0]), x]
         yh = np.dot(x, self.weights)
         return yh
-
-    def create_array_minibatch(self, x, y):
-        matrix = np.c_[x, y]
-        np.random.shuffle(matrix)
-        mini_batches = np.array_split(matrix, self.batch_size)
-        return [(batch[:, :-1], batch[:, -1]) for batch in mini_batches]

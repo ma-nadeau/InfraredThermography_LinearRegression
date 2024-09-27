@@ -326,26 +326,29 @@ def sigmoid(z):
     return 1.0 / (1 + np.exp(-z))
 
 
-def adaptive_moment_estimation(weights, grad, m, v, t, learning_rate, beta1, beta2, epsilon):
-    """
-    Perform the Adam optimization algorithm using the computed gradient.
-    Update the weights using the moment estimates.
-    """
-    # Increment timestep
-    t += 1
+def adaptive_moment_estimation(
+        x_batch, y_batch, weights, m, v, t, learning_rate, beta1, beta2, adam_epsilon, gradient_fn
+):
+    n_samples = x_batch.shape[0]
 
-    # Update biased first moment estimate
-    m = beta1 * m + (1 - beta1) * grad
+    for i in range(n_samples):  # Iterate over mini-batch
+        rand_index = np.random.randint(n_samples)
+        x_rand, y_rand = x_batch[rand_index], y_batch[rand_index]
 
-    # Update biased second moment estimate
-    v = beta2 * v + (1 - beta2) * (grad ** 2)
+        # Calculate gradient using the provided gradient function
+        grad = gradient_fn(x_rand, y_rand)
+        t += 1  # Increment time step
 
-    # Bias correction
-    m_hat = m / (1 - beta1 ** t)
-    v_hat = v / (1 - beta2 ** t)
+        # Update biased first and second moment estimates
+        m = beta1 * m + (1 - beta1) * grad
+        v = beta2 * v + (1 - beta2) * (grad ** 2)
 
-    # Update weights
-    weights -= learning_rate * m_hat / (np.sqrt(v_hat) + epsilon)
+        # Bias-corrected moment estimates
+        m_hat = m / (1 - beta1 ** t)
+        v_hat = v / (1 - beta2 ** t)
+
+        # Update weights using Adam's update rule
+        weights -= learning_rate * m_hat / (np.sqrt(v_hat) + adam_epsilon)
 
     return weights, m, v, t
 

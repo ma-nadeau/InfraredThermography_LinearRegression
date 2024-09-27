@@ -93,7 +93,8 @@ def perform_linear_regression(
         lr = LinearRegression()
         model_name = "Linear_Regression"
 
-    lr.fit(x_train_scaled, y_train)
+    # We set optimization to True if we want to use ADAM.
+    lr.fit(x_train_scaled, y_train, optimization=True)
     yh = lr.predict(x_test_scaled)
 
     plot_actual_vs_predicted(y_test, yh, target_variable, "Results", model_name)

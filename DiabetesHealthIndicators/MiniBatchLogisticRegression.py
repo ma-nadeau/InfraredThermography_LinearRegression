@@ -4,7 +4,7 @@ from Assignment1.Helpers import *
 class MiniBatchLogisticRegression:
     def __init__(
             self,
-            learning_rate=0.01,
+            learning_rate=0.001,
             max_iter=1000,
             epsilon=1e-8,
             batch_size=10,
@@ -44,10 +44,10 @@ class MiniBatchLogisticRegression:
         for e in range(self.epoch):
             mini_batches = create_array_minibatch(x, y, batch_size=self.batch_size)
             for x_batch, y_batch in mini_batches:
-                # self.stochastic_gradient_descent(x_batch, y_batch)
-                grad = self.gradient(x_batch, y_batch)
-                adaptive_moment_estimation(self.weights, grad, self.m, self.v, self.t, self.learning_rate, self.beta1,
-                                           self.beta2, self.epsilon)  # Use Adam for weight updates (Modified)
+                # stochastic_gradient_descent(self, x_batch, y_batch)
+                adaptive_moment_estimation(
+                        x_batch, y_batch, self.weights, self.m, self.v, self.t, self.learning_rate, self.beta1, self.beta2, self.epsilon, self.gradient
+                )
 
     def predict(self, x):
         if self.add_bias:
