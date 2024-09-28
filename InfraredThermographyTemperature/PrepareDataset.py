@@ -2,6 +2,7 @@ from sklearn.preprocessing import LabelEncoder
 from Assignment1.Helpers import *
 from LinearRegression import LinearRegression
 from MiniBatchStochasticLinearRegression import *
+from minibatchLR import *
 
 
 def preprocess_thermography_data(file_name):
@@ -76,8 +77,6 @@ def plot_histogram_correlation(df):
         "Results",
         "Correlation_Infrared_Thermography_Temperature.png",
     )
-
-
 
 
 def perform_linear_regression(
@@ -190,6 +189,28 @@ def linear_regression_test_growing_subset(
     plot_evs_growing_set(results, train_sizes)
 
 
+def mbsgd_test_batch_sizes(
+        df, target_variable="aveOralM"
+):
+    x_train, x_test, y_train, y_test = split_data(
+        df, target_variable, test_size=0.2, random_state=42
+    )
+    x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
+    batch_sizes = [8, 16, 32, 64, 128, x_train_scaled.shape[0]]
+
+    # Dictionary to store losses for different batch sizes
+    losses_by_batch_size = {}
+    r2s_by_batch_size = {}
+
+    # Train models with different batch sizes and record training loss over iterations
+    for batch_size in batch_sizes:
+        model = MiniBatchStochasticLinearRegression(learning_rate=0.01, batch_size=batch_size, epoch=100)
+        losses, r2s = model.fit(x_train_scaled, y_train)
+        losses_by_batch_size[batch_size] = losses
+        r2s_by_batch_size[batch_size] = r2s
+    plot_batch_sizes_result(losses_by_batch_size, r2s_by_batch_size)
+
+
 def main():
     df = preprocess_thermography_data("Data/InfraredThermographyTemperature.csv")
 
@@ -243,6 +264,7 @@ def main():
     linear_regression_test_growing_subset(df)
 
     plot_histogram_correlation(df)
+    mbsgd_test_batch_sizes(df)
     plot_variance_inflation_factor(df, "Diabetes_binary", "Results")
 
 

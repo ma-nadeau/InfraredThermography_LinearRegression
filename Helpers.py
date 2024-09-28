@@ -435,3 +435,36 @@ def plot_evs_growing_set(results, train_sizes, output_folder="Results", title="T
     plot_path = os.path.join(output_folder, f"{title}.png")
     plt.savefig(plot_path)
     plt.close()
+
+
+def plot_batch_sizes_result(losses_by_batch_size, r2s_by_batch_size,
+                            output_folder="Results", title1="Task3.4_linear_mse",
+                            title2="Task3.4_linear_r2"):
+    # Plotting the loss vs iterations for different batch sizes
+    plt.figure(figsize=(10, 6))
+
+    for batch_size, losses in losses_by_batch_size.items():
+        plt.plot(range(len(losses)), losses, label=f'Batch Size {batch_size}')
+
+    plt.xlabel('Iterations')
+    plt.ylabel('Training Loss (MSE)')
+    plt.title('Training Loss vs Number of Iterations for Different Batch Sizes')
+    plt.legend()
+    plt.grid(True)
+    plot_path = os.path.join(output_folder, f"{title1}.png")
+    plt.savefig(plot_path)
+    plt.close()
+
+    plt.figure(figsize=(10, 6))
+
+    for batch_size, r2s in r2s_by_batch_size.items():
+        plt.plot(range(len(r2s)), r2s, label=f'Batch Size {batch_size}')
+
+    plt.xlabel('Iterations')
+    plt.ylabel('R² Score')
+    plt.title('R² Score vs Number of Iterations for Different Batch Sizes')
+    plt.legend()
+    plt.grid(True)
+    plot_path = os.path.join(output_folder, f"{title2}.png")
+    plt.savefig(plot_path)
+    plt.close()
