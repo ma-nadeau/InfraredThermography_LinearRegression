@@ -437,7 +437,75 @@ def plot_evs_growing_set(results, train_sizes, output_folder="Results", title="T
     plt.close()
 
 
-def plot_batch_sizes_result(losses_by_batch_size, r2s_by_batch_size,
+def plot_acc_growing_set(results, train_sizes, output_folder="Results", title="Task3.3_logistic_acc"):
+    # Plot evs for both models
+    plt.figure(figsize=(10, 5))
+    plt.plot(train_sizes, results["log_acc_train"], label="logistic acc Train Set", marker='o')
+    plt.plot(train_sizes, results["log_acc_test"], label="logistic acc Test Set", marker='o')
+    plt.plot(train_sizes, results["mini_acc_train"], label="MBSGD acc Train Set", marker='o')
+    plt.plot(train_sizes, results["mini_acc_test"], label="MBSGD acc Test Set", marker='o')
+    plt.xlabel("Training Set Size")
+    plt.ylabel("Accuracy")
+    plt.title("Accuracy vs Training Set Size")
+    plt.legend()
+    plt.grid(True)
+    plot_path = os.path.join(output_folder, f"{title}.png")
+    plt.savefig(plot_path)
+    plt.close()
+
+
+def plot_f1_growing_set(results, train_sizes, output_folder="Results", title="Task3.3_logistic_f1"):
+    # Plot evs for both models
+    plt.figure(figsize=(10, 5))
+    plt.plot(train_sizes, results["log_f1_train"], label="logistic f1 Train Set", marker='o')
+    plt.plot(train_sizes, results["log_f1_test"], label="logistic f1 Test Set", marker='o')
+    plt.plot(train_sizes, results["mini_f1_train"], label="MBSGD f1 Train Set", marker='o')
+    plt.plot(train_sizes, results["mini_f1_test"], label="MBSGD f1 Test Set", marker='o')
+    plt.xlabel("Training Set Size")
+    plt.ylabel("F1-score")
+    plt.title("F1-score vs Training Set Size")
+    plt.legend()
+    plt.grid(True)
+    plot_path = os.path.join(output_folder, f"{title}.png")
+    plt.savefig(plot_path)
+    plt.close()
+
+
+def plot_pre_growing_set(results, train_sizes, output_folder="Results", title="Task3.3_logistic_pre"):
+    # Plot evs for both models
+    plt.figure(figsize=(10, 5))
+    plt.plot(train_sizes, results["log_pre_train"], label="logistic pre Train Set", marker='o')
+    plt.plot(train_sizes, results["log_pre_test"], label="logistic pre Test Set", marker='o')
+    plt.plot(train_sizes, results["mini_pre_train"], label="MBSGD pre Train Set", marker='o')
+    plt.plot(train_sizes, results["mini_pre_test"], label="MBSGD pre Test Set", marker='o')
+    plt.xlabel("Training Set Size")
+    plt.ylabel("Precision")
+    plt.title("Precision vs Training Set Size")
+    plt.legend()
+    plt.grid(True)
+    plot_path = os.path.join(output_folder, f"{title}.png")
+    plt.savefig(plot_path)
+    plt.close()
+
+
+def plot_rec_growing_set(results, train_sizes, output_folder="Results", title="Task3.3_logistic_rec"):
+    # Plot evs for both models
+    plt.figure(figsize=(10, 5))
+    plt.plot(train_sizes, results["log_rec_train"], label="logistic rec Train Set", marker='o')
+    plt.plot(train_sizes, results["log_rec_test"], label="logistic rec Test Set", marker='o')
+    plt.plot(train_sizes, results["mini_rec_train"], label="MBSGD rec Train Set", marker='o')
+    plt.plot(train_sizes, results["mini_rec_test"], label="MBSGD rec Test Set", marker='o')
+    plt.xlabel("Training Set Size")
+    plt.ylabel("Recall")
+    plt.title("Recall vs Training Set Size")
+    plt.legend()
+    plt.grid(True)
+    plot_path = os.path.join(output_folder, f"{title}.png")
+    plt.savefig(plot_path)
+    plt.close()
+
+
+def plot_batch_sizes_result(losses_by_batch_size, r2s_by_batch_size, log= 0,
                             output_folder="Results", title1="Task3.4_linear_mse",
                             title2="Task3.4_linear_r2"):
     # Plotting the loss vs iterations for different batch sizes
@@ -447,7 +515,7 @@ def plot_batch_sizes_result(losses_by_batch_size, r2s_by_batch_size,
         plt.plot(range(len(losses)), losses, label=f'Batch Size {batch_size}')
 
     plt.xlabel('Iterations')
-    plt.ylabel('Training Loss (MSE)')
+    plt.ylabel('Training Loss')
     plt.title('Training Loss vs Number of Iterations for Different Batch Sizes')
     plt.legend()
     plt.grid(True)
@@ -456,15 +524,15 @@ def plot_batch_sizes_result(losses_by_batch_size, r2s_by_batch_size,
     plt.close()
 
     plt.figure(figsize=(10, 6))
+    if log == 0:
+        for batch_size, r2s in r2s_by_batch_size.items():
+            plt.plot(range(len(r2s)), r2s, label=f'Batch Size {batch_size}')
 
-    for batch_size, r2s in r2s_by_batch_size.items():
-        plt.plot(range(len(r2s)), r2s, label=f'Batch Size {batch_size}')
-
-    plt.xlabel('Iterations')
-    plt.ylabel('R² Score')
-    plt.title('R² Score vs Number of Iterations for Different Batch Sizes')
-    plt.legend()
-    plt.grid(True)
-    plot_path = os.path.join(output_folder, f"{title2}.png")
-    plt.savefig(plot_path)
-    plt.close()
+        plt.xlabel('Iterations')
+        plt.ylabel('R² Score')
+        plt.title('R² Score vs Number of Iterations for Different Batch Sizes')
+        plt.legend()
+        plt.grid(True)
+        plot_path = os.path.join(output_folder, f"{title2}.png")
+        plt.savefig(plot_path)
+        plt.close()

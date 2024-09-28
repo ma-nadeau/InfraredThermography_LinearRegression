@@ -1,5 +1,5 @@
 from Assignment1.Helpers import *
-
+from sklearn.metrics import log_loss
 
 class MiniBatchLogisticRegression:
     def __init__(
@@ -34,7 +34,7 @@ class MiniBatchLogisticRegression:
     def fit(self, x, y, optimization=False):
         if self.add_bias:
             x = np.c_[np.ones(x.shape[0]), x]
-
+        losses = []
         n_samples, n_features = x.shape
 
         self.weights = np.zeros(n_features)
@@ -51,6 +51,10 @@ class MiniBatchLogisticRegression:
                     )
                 else:
                     stochastic_gradient_descent(self, x_batch, y_batch)
+            y_train_pred = sigmoid(np.dot(x, self.weights))
+            loss = log_loss(y, y_train_pred)
+            losses.append(loss)
+        return losses
 
     def predict(self, x):
         if self.add_bias:
