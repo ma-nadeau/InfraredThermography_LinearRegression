@@ -211,6 +211,49 @@ def mbsgd_test_batch_sizes(
     plot_batch_sizes_result(losses_by_batch_size, r2s_by_batch_size)
 
 
+def linear_regression_learning_rate_test(
+        df, target_variable="aveOralM"
+):
+    def evaluate_model(model, X_train, Y_train, X_test, Y_test):
+        """Helper function to fit the model and calculate metrics."""
+        # Fit the model
+        model.fit(X_train, Y_train)
+
+        # Make predictions
+        y_pred_train = model.predict(X_train)
+        y_pred_test = model.predict(X_test)
+
+        # Compute MSE and R² for both train and test
+        train_mse = mean_squared_error(Y_train, y_pred_train)
+        test_mse = mean_squared_error(Y_test, y_pred_test)
+        train_r2 = r2_score(Y_train, y_pred_train)
+        test_r2 = r2_score(Y_test, y_pred_test)
+
+        return train_mse, test_mse, train_r2, test_r2
+
+    x_train, x_test, y_train, y_test = split_data(
+        df, target_variable, test_size=0.2, random_state=42
+    )
+    x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
+    results = {
+        "mini_mse_train": [],
+        "mini_mse_test": [],
+        "mini_r2_train": [],
+        "mini_r2_test": [],
+    }
+    learning_rates = [0.001, 0.005, 0.01, 0.05]
+    for lr in learning_rates:
+
+        minibatch = MiniBatchStochasticLinearRegression(learning_rate=lr)
+        mini_mse_train, mini_mse_test, mini_r2_train, mini_r2_test = evaluate_model(
+            minibatch, x_train_scaled, y_train, x_test_scaled, y_test)
+
+        results["mini_mse_train"].append(mini_mse_train)
+        results["mini_mse_test"].append(mini_mse_test)
+        results["mini_r2_train"].append(mini_r2_train)
+        results["mini_r2_test"].append(mini_r2_test)
+
+    plot_linear_learning_rates(results, learning_rates)
 def main():
     df = preprocess_thermography_data("Data/InfraredThermographyTemperature.csv")
 
@@ -264,7 +307,8 @@ def main():
     linear_regression_test_growing_subset(df)
 
     plot_histogram_correlation(df)
-    mbsgd_test_batch_sizes(df)
+    #mbsgd_test_batch_sizes(df)
+    linear_regression_learning_rate_test(df)
     plot_variance_inflation_factor(df, "Diabetes_binary", "Results")
 
 

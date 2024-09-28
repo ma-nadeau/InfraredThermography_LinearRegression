@@ -385,7 +385,30 @@ def stochastic_gradient_descent(self, x, y):
         if np.linalg.norm(grad) < self.epsilon:
             break
 
-
+def plot_linear_learning_rates(results, learning_rates, output_folder="Results", title1="Task3.5_linear_mse",title2="Task3.5_linear_R2"):
+    # Plot MSE for both models
+    plt.figure(figsize=(10, 5))
+    plt.plot(learning_rates, results["mini_mse_train"], label="MSE Train Set", marker='o')
+    plt.plot(learning_rates, results["mini_mse_test"], label="MSE Test Set", marker='o')
+    plt.xlabel("Learning Rates")
+    plt.ylabel("Mean Squared Error")
+    plt.title("MSE vs Learning Rates")
+    plt.legend()
+    plt.grid(True)
+    plot_path = os.path.join(output_folder, f"{title1}.png")
+    plt.savefig(plot_path)
+    plt.close()
+    plt.figure(figsize=(10, 5))
+    plt.plot(learning_rates, results["mini_r2_train"], label="R Square Train Set", marker='o')
+    plt.plot(learning_rates, results["mini_r2_test"], label="R square Test Set", marker='o')
+    plt.xlabel("Learning Rates")
+    plt.ylabel("R Square")
+    plt.title("R2 vs Learning Rates")
+    plt.legend()
+    plt.grid(True)
+    plot_path = os.path.join(output_folder, f"{title2}.png")
+    plt.savefig(plot_path)
+    plt.close()
 def plot_mse_growing_set(results, train_sizes, output_folder="Results", title="Task3.3_linear_mse"):
     # Plot MSE for both models
     plt.figure(figsize=(10, 5))
