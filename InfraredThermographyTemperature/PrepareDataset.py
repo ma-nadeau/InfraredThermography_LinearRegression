@@ -77,16 +77,9 @@ def plot_histogram_correlation(df):
         "Correlation_Infrared_Thermography_Temperature.png",
     )
 
-def perform_linear_regression_test_growing_subset(
-        df, target_variable="aveOralM", model_type="standard", batch_size=None
-):
-    x_train, x_test, y_train, y_test = split_data(
-        df, target_variable, test_size=0.3, random_state=42
-    )
-    x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
-    plot_growing_subset_linear(x_train_scaled,y_train,x_test_scaled,y_test)
-    
+
+
 def perform_linear_regression(
         df, target_variable="aveOralM", model_type="standard", batch_size=None
 ):
@@ -119,6 +112,82 @@ def run_regression_tests(df, label, regression_type="standard"):
         perform_linear_regression(df, model_type="mini_batch", batch_size=32)
     else:
         perform_linear_regression(df)
+
+
+def linear_regression_test_growing_subset(
+        df, target_variable="aveOralM"
+):
+    def evaluate_model(model, X_train, Y_train, X_test, Y_test):
+        """Helper function to fit the model and calculate metrics."""
+        # Fit the model
+        model.fit(X_train, Y_train)
+
+        # Make predictions
+        y_pred_train = model.predict(X_train)
+        y_pred_test = model.predict(X_test)
+
+        # Compute MSE and R² for both train and test
+        train_mse = mean_squared_error(Y_train, y_pred_train)
+        test_mse = mean_squared_error(Y_test, y_pred_test)
+        train_evs = explained_variance_score(Y_train, y_pred_train)
+        test_evs = explained_variance_score(Y_test, y_pred_test)
+        train_r2 = r2_score(Y_train, y_pred_train)
+        test_r2 = r2_score(Y_test, y_pred_test)
+
+        return train_mse, test_mse, train_r2, test_r2, train_evs, test_evs
+
+    x_train, x_test, y_train, y_test = split_data(
+        df, target_variable, test_size=0.2, random_state=42
+    )
+    x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
+    results = {
+        "lin_mse_train": [],
+        "lin_mse_test": [],
+        "lin_r2_train": [],
+        "lin_r2_test": [],
+        "lin_evs_train": [],
+        "lin_evs_test": [],
+        "mini_mse_train": [],
+        "mini_mse_test": [],
+        "mini_r2_train": [],
+        "mini_r2_test": [],
+        "mini_evs_train": [],
+        "mini_evs_test": []
+    }
+    train_sizes = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    for size in train_sizes:
+        indices = np.random.choice(x_train_scaled.shape[0],
+                                   size=int(size * x_train_scaled.shape[0]),
+                                   replace=False)
+        x_train_subset = x_train_scaled[indices]
+        y_train_subset = y_train.iloc[indices]
+
+        analytical = LinearRegression()
+        lin_mse_train, lin_mse_test, lin_r2_train, lin_r2_test, lin_evs_train, lin_evs_test = evaluate_model(
+            analytical, x_train_subset, y_train_subset, x_test_scaled, y_test)
+
+        results["lin_mse_train"].append(lin_mse_train)
+        results["lin_mse_test"].append(lin_mse_test)
+        results["lin_r2_train"].append(lin_r2_train)
+        results["lin_r2_test"].append(lin_r2_test)
+        results["lin_evs_train"].append(lin_evs_train)
+        results["lin_evs_test"].append(lin_evs_test)
+
+        minibatch = MiniBatchStochasticLinearRegression()
+        mini_mse_train, mini_mse_test, mini_r2_train, mini_r2_test, mini_evs_train, mini_evs_test = evaluate_model(
+            minibatch, x_train_subset, y_train_subset, x_test_scaled, y_test
+        )
+
+        results["mini_mse_train"].append(mini_mse_train)
+        results["mini_mse_test"].append(mini_mse_test)
+        results["mini_r2_train"].append(mini_r2_train)
+        results["mini_r2_test"].append(mini_r2_test)
+        results["mini_evs_train"].append(mini_evs_train)
+        results["mini_evs_test"].append(mini_evs_test)
+
+    plot_mse_growing_set(results, train_sizes)
+    plot_r2_growing_set(results, train_sizes)
+    plot_evs_growing_set(results, train_sizes)
 
 
 def main():
@@ -171,6 +240,8 @@ def main():
         "Results",
         "Infrared_Thermography_Correlation_Matrix_After_Dropping_Values.png",
     )
+    linear_regression_test_growing_subset(df)
+
     plot_histogram_correlation(df)
     plot_variance_inflation_factor(df, "Diabetes_binary", "Results")
 
