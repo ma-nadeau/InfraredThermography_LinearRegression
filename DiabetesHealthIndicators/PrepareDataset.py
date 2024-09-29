@@ -281,14 +281,14 @@ def main():
     df = preprocess_diabetes_data("Data/DiabetesHealthIndicators.csv")
 
     # Perform regression testing for standard and mini-batch.
-    run_regression_tests(df, "Test logistic regression", regression_type="standard")
-    run_regression_tests(
-        df, "Test mini-batch logistic regression", regression_type="mini_batch"
-    )
+    # run_regression_tests(df, "Test logistic regression", regression_type="standard")
+    # run_regression_tests(
+    #     df, "Test mini-batch logistic regression", regression_type="mini_batch"
+    # )
 
-    logistic_regression_test_growing_subset(df)
-
-    mbsgd_test_batch_sizes(df)
+    # logistic_regression_test_growing_subset(df)
+    #
+    # mbsgd_test_batch_sizes(df)
     logistic_regression_test_learning_rates(df)
     plot_histogram(df, "Results", "Histogram_Diabetes_Health_Indicators.png")
     plot_correlation_matrix(df, "Results", "CDC_Correlation_Matrix")

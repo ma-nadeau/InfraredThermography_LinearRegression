@@ -309,7 +309,7 @@ def main():
 
     plot_histogram_correlation(df)
 
-    #mbsgd_test_batch_sizes(df)
+    mbsgd_test_batch_sizes(df)
 
     linear_regression_learning_rate_test(df)
     plot_variance_inflation_factor(df, "Diabetes_binary", "Results")
