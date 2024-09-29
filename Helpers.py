@@ -7,8 +7,15 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 from sklearn.metrics import confusion_matrix, roc_curve, auc
 import numpy as np
 import seaborn as sns
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, mean_squared_error, r2_score, \
-    explained_variance_score
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    mean_squared_error,
+    r2_score,
+    explained_variance_score,
+)
 
 
 # Obtain correlation matrix.
@@ -55,7 +62,7 @@ def print_linear_regression_model_stats(x_test, y_test, yh):
     print(f"Mean Squared Error: {mse}")
 
     r_squared = 1 - (
-            np.sum((y_test - yh) ** 2) / np.sum((y_test - np.mean(y_test)) ** 2)
+        np.sum((y_test - yh) ** 2) / np.sum((y_test - np.mean(y_test)) ** 2)
     )
     print(f"R-squared: {r_squared}")
 
@@ -131,7 +138,17 @@ def sigmoid(z):
 
 
 def adaptive_moment_estimation(
-        x_batch, y_batch, weights, m, v, t, learning_rate, beta1, beta2, adam_epsilon, gradient_fn
+    x_batch,
+    y_batch,
+    weights,
+    m,
+    v,
+    t,
+    learning_rate,
+    beta1,
+    beta2,
+    adam_epsilon,
+    gradient_fn,
 ):
     n_samples = x_batch.shape[0]
 
@@ -145,11 +162,11 @@ def adaptive_moment_estimation(
 
         # Update biased first and second moment estimates
         m = beta1 * m + (1 - beta1) * grad
-        v = beta2 * v + (1 - beta2) * (grad ** 2)
+        v = beta2 * v + (1 - beta2) * (grad**2)
 
         # Bias-corrected moment estimates
-        m_hat = m / (1 - beta1 ** t)
-        v_hat = v / (1 - beta2 ** t)
+        m_hat = m / (1 - beta1**t)
+        v_hat = v / (1 - beta2**t)
 
         # Update weights using Adam's update rule
         weights -= learning_rate * m_hat / (np.sqrt(v_hat) + adam_epsilon)
@@ -170,7 +187,7 @@ def create_array_minibatch(x, y, batch_size):
     np.random.shuffle(matrix)
     mini_batches = []
     for i in range(0, len(matrix), batch_size):
-        batch = matrix[i: i + batch_size]
+        batch = matrix[i : i + batch_size]
         mini_batches.append((batch[:, :-1], batch[:, -1]))
 
     # mini_batches = np.array_split(matrix, batch_size)
@@ -178,9 +195,9 @@ def create_array_minibatch(x, y, batch_size):
     return mini_batches
 
 
-def stochastic_gradient_descent(self, x, y, batch_size):
+def stochastic_gradient_descent(self, x, y):
     """
-      Implement stochastic gradient descent.
+    Implement stochastic gradient descent.
     """
     # n_samples, n_features = x.shape
     #
@@ -193,12 +210,11 @@ def stochastic_gradient_descent(self, x, y, batch_size):
     #         x[rand_index],
     #         y[rand_index],
     #     )  # Obtain the two corresponding sample and result
-    grad = self.gradient(x, y, batch_size)
+    grad = self.gradient(x, y)
     self.weights = self.weights - self.learning_rate * grad
 
-
-        # if np.linalg.norm(grad) < self.epsilon:
-        #     break
+    # if np.linalg.norm(grad) < self.epsilon:
+    #     break
     #
     # for (x_batch, y_batch) in mini_batches:  # Iterate over all the samples in the X
     #     # fetch the index of random value in x

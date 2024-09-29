@@ -1,17 +1,18 @@
 from Assignment1.Helpers import *
 from sklearn.metrics import log_loss
 
+
 class MiniBatchLogisticRegression:
     def __init__(
-            self,
-            learning_rate=0.01,
-            max_iter=1000,
-            epsilon=1e-8,
-            batch_size=10,
-            epoch=100,
-            add_bias=True,
-            beta1=0.9,
-            beta2=0.999,
+        self,
+        learning_rate=0.01,
+        max_iter=1000,
+        epsilon=1e-8,
+        batch_size=10,
+        epoch=100,
+        add_bias=True,
+        beta1=0.9,
+        beta2=0.999,
     ):
         self.weights = None
         self.learning_rate = learning_rate
@@ -28,7 +29,9 @@ class MiniBatchLogisticRegression:
 
     def gradient(self, x, y):
         yh = sigmoid(np.dot(x, self.weights))
-        grad = np.dot(x.T, yh - y)  # divide by N because cost is mean over N points
+        grad = (
+            np.dot(x.T, yh - y) / self.batch_size
+        )  # divide by N because cost is mean over N points
         return grad  # size n_features
 
     def fit(self, x, y, optimization=False):
@@ -63,8 +66,17 @@ class MiniBatchLogisticRegression:
             for x_batch, y_batch in mini_batches:
                 if optimization:
                     adaptive_moment_estimation(
-                        x_batch, y_batch, self.weights, self.m, self.v, self.t, self.learning_rate, self.beta1,
-                        self.beta2, self.epsilon, self.gradient
+                        x_batch,
+                        y_batch,
+                        self.weights,
+                        self.m,
+                        self.v,
+                        self.t,
+                        self.learning_rate,
+                        self.beta1,
+                        self.beta2,
+                        self.epsilon,
+                        self.gradient,
                     )
                 else:
                     stochastic_gradient_descent(self, x_batch, y_batch)
@@ -86,5 +98,3 @@ class MiniBatchLogisticRegression:
         yh_real = sigmoid(linear_model)
         yh_bool = (yh_real > 0.5).astype(int)
         return yh_bool, yh_real
-
-

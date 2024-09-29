@@ -2,8 +2,8 @@ from LogisticRegression import *
 from MiniBatchLogisticRegression import *
 from Assignment1.Helpers import *
 from Assignment1.PlotHelpers import *
-# from minibatchLogR import *
 
+# from minibatchLogR import *
 
 
 def preprocess_diabetes_data(file_name):
@@ -38,10 +38,10 @@ def run_regression_tests(df, label, regression_type="standard"):
         perform_logistic_regression(df)
 
 
-def perform_logistic_regression(df, target_variable="Diabetes_binary", model_type="standard"):
-    x_train, x_test, y_train, y_test = oversampling_dataset(
-        df, target_variable
-    )
+def perform_logistic_regression(
+    df, target_variable="Diabetes_binary", model_type="standard"
+):
+    x_train, x_test, y_train, y_test = undersampling_dataset(df, target_variable)
 
     x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
@@ -56,7 +56,9 @@ def perform_logistic_regression(df, target_variable="Diabetes_binary", model_typ
     yh_bool, yh_real = lr.predict(x_test_scaled)
 
     plot_residual(y_test, yh_bool, "Results", f"{model_name}_Residual.png")
-    plot_residual_distribution(y_test, yh_bool, "Results", f"{model_name}_Residual_Distribution.png")
+    plot_residual_distribution(
+        y_test, yh_bool, "Results", f"{model_name}_Residual_Distribution.png"
+    )
 
     # Plot confusion matrix.
     plot_confusion_matrix(y_test, yh_bool, title=f"{model_name}_Confusion_Matrix.png")
@@ -87,15 +89,20 @@ def evaluate_model(model, X_train, Y_train, X_test, Y_test):
     train_recall = recall_score(Y_train, y_pred_train)
     test_recall = recall_score(Y_test, y_pred_test)
 
-    return train_accuracy, test_accuracy, train_f1, test_f1, train_precision, test_precision, train_recall, test_recall
-
-
-def logistic_regression_test_growing_subset(
-        df, target_variable="Diabetes_binary"
-):
-    x_train, x_test, y_train, y_test = oversampling_dataset(
-        df, target_variable
+    return (
+        train_accuracy,
+        test_accuracy,
+        train_f1,
+        test_f1,
+        train_precision,
+        test_precision,
+        train_recall,
+        test_recall,
     )
+
+
+def logistic_regression_test_growing_subset(df, target_variable="Diabetes_binary"):
+    x_train, x_test, y_train, y_test = undersampling_dataset(df, target_variable)
 
     x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
@@ -115,19 +122,31 @@ def logistic_regression_test_growing_subset(
         "mini_pre_train": [],
         "mini_pre_test": [],
         "mini_rec_train": [],
-        "mini_rec_test": []
+        "mini_rec_test": [],
     }
     train_sizes = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
     for size in train_sizes:
-        indices = np.random.choice(x_train_scaled.shape[0],
-                                   size=int(size * x_train_scaled.shape[0]),
-                                   replace=False)
+        indices = np.random.choice(
+            x_train_scaled.shape[0],
+            size=int(size * x_train_scaled.shape[0]),
+            replace=False,
+        )
         x_train_subset = x_train_scaled[indices]
         y_train_subset = y_train.iloc[indices]
 
         Logistic_gd = LogisticRegression()
-        log_acc_train, log_acc_test, log_f1_train, log_f1_test, log_pre_train, log_pre_test, log_rec_train, log_rec_test = evaluate_model(
-            Logistic_gd, x_train_subset, y_train_subset, x_test_scaled, y_test)
+        (
+            log_acc_train,
+            log_acc_test,
+            log_f1_train,
+            log_f1_test,
+            log_pre_train,
+            log_pre_test,
+            log_rec_train,
+            log_rec_test,
+        ) = evaluate_model(
+            Logistic_gd, x_train_subset, y_train_subset, x_test_scaled, y_test
+        )
 
         results["log_acc_train"].append(log_acc_train)
         results["log_acc_test"].append(log_acc_test)
@@ -139,7 +158,16 @@ def logistic_regression_test_growing_subset(
         results["log_rec_test"].append(log_rec_test)
 
         minibatch = MiniBatchLogisticRegression()
-        mini_acc_train, mini_acc_test, mini_f1_train, mini_f1_test, mini_pre_train, mini_pre_test, mini_rec_train, mini_rec_test = evaluate_model(
+        (
+            mini_acc_train,
+            mini_acc_test,
+            mini_f1_train,
+            mini_f1_test,
+            mini_pre_train,
+            mini_pre_test,
+            mini_rec_train,
+            mini_rec_test,
+        ) = evaluate_model(
             minibatch, x_train_subset, y_train_subset, x_test_scaled, y_test
         )
 
@@ -158,9 +186,7 @@ def logistic_regression_test_growing_subset(
     plot_rec_growing_set(results, train_sizes)
 
 
-def mbsgd_test_batch_sizes(
-        df, target_variable="Diabetes_binary"
-):
+def mbsgd_test_batch_sizes(df, target_variable="Diabetes_binary"):
     x_train, x_test, y_train, y_test = split_data(
         df, target_variable, test_size=0.2, random_state=42
     )
@@ -179,12 +205,8 @@ def mbsgd_test_batch_sizes(
     plot_batch_sizes_result(losses_by_batch_size, {}, 1, title1="Task3.4_logistic")
 
 
-def logistic_regression_test_learning_rates(
-        df, target_variable="Diabetes_binary"
-):
-    x_train, x_test, y_train, y_test = oversampling_dataset(
-        df, target_variable
-    )
+def logistic_regression_test_learning_rates(df, target_variable="Diabetes_binary"):
+    x_train, x_test, y_train, y_test = undersampling_dataset(df, target_variable)
 
     x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
@@ -204,14 +226,22 @@ def logistic_regression_test_learning_rates(
         "mini_pre_train": [],
         "mini_pre_test": [],
         "mini_rec_train": [],
-        "mini_rec_test": []
+        "mini_rec_test": [],
     }
     learning_rates = [0.01, 0.02, 0.05]
     for lr in learning_rates:
         Logistic_gd = LogisticRegression(learning_rate=lr)
 
-        log_acc_train, log_acc_test, log_f1_train, log_f1_test, log_pre_train, log_pre_test, log_rec_train, log_rec_test = evaluate_model(
-            Logistic_gd, x_train_scaled, y_train, x_test_scaled, y_test)
+        (
+            log_acc_train,
+            log_acc_test,
+            log_f1_train,
+            log_f1_test,
+            log_pre_train,
+            log_pre_test,
+            log_rec_train,
+            log_rec_test,
+        ) = evaluate_model(Logistic_gd, x_train_scaled, y_train, x_test_scaled, y_test)
 
         results["log_acc_train"].append(log_acc_train)
         results["log_acc_test"].append(log_acc_test)
@@ -223,9 +253,16 @@ def logistic_regression_test_learning_rates(
         results["log_rec_test"].append(log_rec_test)
 
         minibatch = MiniBatchLogisticRegression(learning_rate=lr)
-        mini_acc_train, mini_acc_test, mini_f1_train, mini_f1_test, mini_pre_train, mini_pre_test, mini_rec_train, mini_rec_test = evaluate_model(
-            minibatch, x_train, y_train, x_test_scaled, y_test
-        )
+        (
+            mini_acc_train,
+            mini_acc_test,
+            mini_f1_train,
+            mini_f1_test,
+            mini_pre_train,
+            mini_pre_test,
+            mini_rec_train,
+            mini_rec_test,
+        ) = evaluate_model(minibatch, x_train, y_train, x_test_scaled, y_test)
 
         results["mini_acc_train"].append(mini_acc_train)
         results["mini_acc_test"].append(mini_acc_test)
@@ -236,7 +273,7 @@ def logistic_regression_test_learning_rates(
         results["mini_rec_train"].append(mini_rec_train)
         results["mini_rec_test"].append(mini_rec_test)
 
-    plot_logistic_learning_rates(results,learning_rates)
+    plot_logistic_learning_rates(results, learning_rates)
 
 
 def main():
@@ -244,15 +281,15 @@ def main():
 
     # Perform regression testing for standard and mini-batch.
     run_regression_tests(df, "Test logistic regression", regression_type="standard")
-    run_regression_tests(df, "Test mini-batch logistic regression", regression_type="mini_batch")
+    run_regression_tests(
+        df, "Test mini-batch logistic regression", regression_type="mini_batch"
+    )
 
     logistic_regression_test_growing_subset(df)
 
-    #mbsgd_test_batch_sizes(df)
+    mbsgd_test_batch_sizes(df)
     logistic_regression_test_learning_rates(df)
-    plot_histogram(
-        df, "Results", "Histogram_Diabetes_Health_Indicators.png"
-    )
+    plot_histogram(df, "Results", "Histogram_Diabetes_Health_Indicators.png")
     plot_correlation_matrix(df, "Results", "CDC_Correlation_Matrix")
 
     plot_variance_inflation_factor(df, "Diabetes_binary", "Results")
