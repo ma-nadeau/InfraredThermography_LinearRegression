@@ -2,7 +2,7 @@ from LogisticRegression import *
 from MiniBatchLogisticRegression import *
 from Assignment1.Helpers import *
 from Assignment1.PlotHelpers import *
-from minibatchLogR import *
+# from minibatchLogR import *
 
 
 
@@ -243,8 +243,8 @@ def main():
     df = preprocess_diabetes_data("Data/DiabetesHealthIndicators.csv")
 
     # Perform regression testing for standard and mini-batch.
-    #run_regression_tests(df, "Test logistic regression", regression_type="standard")
-    #run_regression_tests(df, "Test mini-batch logistic regression", regression_type="mini_batch")
+    run_regression_tests(df, "Test logistic regression", regression_type="standard")
+    run_regression_tests(df, "Test mini-batch logistic regression", regression_type="mini_batch")
 
     logistic_regression_test_growing_subset(df)
 

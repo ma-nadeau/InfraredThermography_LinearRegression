@@ -11,7 +11,6 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
     explained_variance_score
 
 
-
 # Obtain correlation matrix.
 def get_correlation(df, target):
     correlation_matrix = df.corr()
@@ -29,6 +28,7 @@ def calculate_variance_inflation_factor(df):
     print(vif)
     return vif
 
+
 # Split data into test and train.
 def split_data(df, feature, test_size=0.2, random_state=None):
     y = df[feature]
@@ -45,9 +45,6 @@ def scale_data(x_train_data, x_test_data):
     x_train_data_scaled = scaler.fit_transform(x_train_data)
     x_test_data_scaled = scaler.transform(x_test_data)
     return x_train_data_scaled, x_test_data_scaled
-
-
-
 
 
 def print_linear_regression_model_stats(x_test, y_test, yh):
@@ -164,29 +161,61 @@ def create_array_minibatch(x, y, batch_size):
     """
     Create mini-batches for mini-batch gradient descent.
     """
+    # matrix = np.c_[x, y]
+    # np.random.shuffle(matrix)
+    # mini_batches = np.array_split(matrix, batch_size)
+    # return [(batch[:, :-1], batch[:, -1]) for batch in mini_batches]
+
     matrix = np.c_[x, y]
     np.random.shuffle(matrix)
-    mini_batches = np.array_split(matrix, batch_size)
-    return [(batch[:, :-1], batch[:, -1]) for batch in mini_batches]
+    mini_batches = []
+    for i in range(0, len(matrix), batch_size):
+        batch = matrix[i: i + batch_size]
+        mini_batches.append((batch[:, :-1], batch[:, -1]))
+
+    # mini_batches = np.array_split(matrix, batch_size)
+    # return [(batch[:, :-1], batch[:, -1]) for batch in mini_batches]
+    return mini_batches
 
 
-def stochastic_gradient_descent(self, x, y):
+def stochastic_gradient_descent(self, x, y, batch_size):
     """
       Implement stochastic gradient descent.
     """
-    n_samples, n_features = x.shape
+    # n_samples, n_features = x.shape
+    #
+    # for i in range(n_samples):  # Iterate over all the samples in the X
+    #     rand_index = np.random.randint(
+    #         n_samples
+    #     )  # fetch the index of random value in x
+    #
+    #     x_rand, y_rand = (
+    #         x[rand_index],
+    #         y[rand_index],
+    #     )  # Obtain the two corresponding sample and result
+    grad = self.gradient(x, y, batch_size)
+    self.weights = self.weights - self.learning_rate * grad
 
-    for i in range(n_samples):  # Iterate over all the samples in the X
-        rand_index = np.random.randint(
-            n_samples
-        )  # fetch the index of random value in x
 
-        x_rand, y_rand = (
-            x[rand_index],
-            y[rand_index],
-        )  # Obtain the two corresponding sample and result
-
-        grad = self.gradient(x_rand, y_rand)
-        self.weights = self.weights - self.learning_rate * grad
-        if np.linalg.norm(grad) < self.epsilon:
-            break
+        # if np.linalg.norm(grad) < self.epsilon:
+        #     break
+    #
+    # for (x_batch, y_batch) in mini_batches:  # Iterate over all the samples in the X
+    #     # fetch the index of random value in x
+    #     print('x batch')
+    #     print(x_batch)
+    #
+    #     print('y batch')
+    #     print(y_batch)
+    #
+    #     rand_index = np.random.randint(len(x_batch))
+    #     # Obtain the two corresponding sample and result
+    #     x_rand, y_rand = (
+    #         x_batch[rand_index],
+    #         y_batch[rand_index],
+    #     )
+    #
+    #     grad = self.gradient(x_rand, y_rand)
+    #     self.weights = self.weights - self.learning_rate * grad
+    #     if np.linalg.norm(grad) < self.epsilon:
+    #         break

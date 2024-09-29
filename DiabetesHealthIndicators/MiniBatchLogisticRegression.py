@@ -41,6 +41,23 @@ class MiniBatchLogisticRegression:
         self.m = np.zeros(n_features)  # Initialize first moment (Added for Adam)
         self.v = np.zeros(n_features)  # Initialize second moment (Added for Adam)
 
+        # for e in range(self.epoch):
+        #     mini_batches = create_array_minibatch(x, y, batch_size=self.batch_size)
+        #     for x_batch, y_batch in mini_batches:
+        #         if optimization:
+        #             adaptive_moment_estimation(
+        #                 x_batch, y_batch, self.weights, self.m, self.v, self.t, self.learning_rate, self.beta1,
+        #                 self.beta2, self.epsilon, self.gradient
+        #             )
+        #         else:
+        #             stochastic_gradient_descent(self, x_batch, y_batch)
+        #     y_train_pred = sigmoid(np.dot(x, self.weights))
+        #     loss = log_loss(y, y_train_pred)
+        #     losses.append(loss)
+        # return losses
+        # To track convergence and iterations
+        iterations = 0
+
         for e in range(self.epoch):
             mini_batches = create_array_minibatch(x, y, batch_size=self.batch_size)
             for x_batch, y_batch in mini_batches:
@@ -54,7 +71,13 @@ class MiniBatchLogisticRegression:
             y_train_pred = sigmoid(np.dot(x, self.weights))
             loss = log_loss(y, y_train_pred)
             losses.append(loss)
-        return losses
+            iterations += 1
+
+            # Early stopping condition if loss stabilizes
+            if len(losses) > 1 and abs(losses[-1] - losses[-2]) < self.epsilon:
+                break
+
+        return iterations, losses
 
     def predict(self, x):
         if self.add_bias:

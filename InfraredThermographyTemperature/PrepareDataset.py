@@ -279,19 +279,20 @@ def main():
         "canthi4Max1",
         "T_FHRC1",
         "T_FHLC1",
-        "T_FHBC1",
-        "T_FHTC1",
-        "T_OR1",
-        "T_Max1",
-        "T_FH_Max1",
-        "T_FHC_Max1",
-        "LCC1",
-        "canthiMax1",
-        "Max1R13_1",
-        "aveAllL13_1",
-        "T_RC1",
-        "T_LC1",
-        "RCC1",
+        # "T_FHBC1",
+        # "T_FHTC1",
+        # "T_OR1",
+        # "T_Max1",
+        # "T_FH_Max1",
+        # "T_FHC_Max1",
+        # "LCC1",
+        # "canthiMax1",
+        # "Max1R13_1",
+        # "aveAllL13_1",
+        # "T_RC1",
+        # "T_LC1",
+        # "RCC1",
+        "aveOralF"
     ]
     df.drop(columns_to_drop, axis=1, inplace=True)
 
@@ -305,11 +306,13 @@ def main():
         "Results",
         "Infrared_Thermography_Correlation_Matrix_After_Dropping_Values.png",
     )
-    linear_regression_test_growing_subset(df)
+    # linear_regression_test_growing_subset(df)
 
     plot_histogram_correlation(df)
-    #mbsgd_test_batch_sizes(df)
-    linear_regression_learning_rate_test(df)
+
+    mbsgd_test_batch_sizes(df)
+
+    # linear_regression_learning_rate_test(df)
     plot_variance_inflation_factor(df, "Diabetes_binary", "Results")
 
 
