@@ -175,8 +175,7 @@ def linear_regression_test_growing_subset(
 
         minibatch = MiniBatchStochasticLinearRegression()
         mini_mse_train, mini_mse_test, mini_r2_train, mini_r2_test, mini_evs_train, mini_evs_test = evaluate_model(
-            minibatch, x_train_subset, y_train_subset, x_test_scaled, y_test
-        )
+            minibatch, x_train_subset, y_train_subset, x_test_scaled, y_test)
 
         results["mini_mse_train"].append(mini_mse_train)
         results["mini_mse_test"].append(mini_mse_test)
@@ -205,7 +204,7 @@ def mbsgd_test_batch_sizes(
 
     # Train models with different batch sizes and record training loss over iterations
     for batch_size in batch_sizes:
-        model = MiniBatchStochasticLinearRegression(learning_rate=0.01, batch_size=batch_size, epoch=100)
+        model = MiniBatchStochasticLinearRegression(learning_rate=0.1, batch_size=batch_size, epoch=100)
         losses, r2s = model.fit(x_train_scaled, y_train)
         losses_by_batch_size[batch_size] = losses
         r2s_by_batch_size[batch_size] = r2s
@@ -242,7 +241,7 @@ def linear_regression_learning_rate_test(
         "mini_r2_train": [],
         "mini_r2_test": [],
     }
-    learning_rates = [0.001, 0.005, 0.01, 0.05]
+    learning_rates = [0.005, 0.01, 0.5]
     for lr in learning_rates:
 
         minibatch = MiniBatchStochasticLinearRegression(learning_rate=lr)
@@ -279,19 +278,19 @@ def main():
         "canthi4Max1",
         "T_FHRC1",
         "T_FHLC1",
-        # "T_FHBC1",
-        # "T_FHTC1",
-        # "T_OR1",
-        # "T_Max1",
-        # "T_FH_Max1",
-        # "T_FHC_Max1",
-        # "LCC1",
-        # "canthiMax1",
-        # "Max1R13_1",
-        # "aveAllL13_1",
-        # "T_RC1",
-        # "T_LC1",
-        # "RCC1",
+        "T_FHBC1",
+        "T_FHTC1",
+         "T_OR1",
+         "T_Max1",
+         "T_FH_Max1",
+         "T_FHC_Max1",
+         "LCC1",
+         "canthiMax1",
+         "Max1R13_1",
+         "aveAllL13_1",
+         "T_RC1",
+         "T_LC1",
+         "RCC1",
         "aveOralF"
     ]
     df.drop(columns_to_drop, axis=1, inplace=True)
@@ -306,13 +305,13 @@ def main():
         "Results",
         "Infrared_Thermography_Correlation_Matrix_After_Dropping_Values.png",
     )
-    # linear_regression_test_growing_subset(df)
+    linear_regression_test_growing_subset(df)
 
     plot_histogram_correlation(df)
 
-    mbsgd_test_batch_sizes(df)
+    #mbsgd_test_batch_sizes(df)
 
-    # linear_regression_learning_rate_test(df)
+    linear_regression_learning_rate_test(df)
     plot_variance_inflation_factor(df, "Diabetes_binary", "Results")
 
 

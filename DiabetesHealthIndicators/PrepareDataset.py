@@ -191,7 +191,8 @@ def mbsgd_test_batch_sizes(df, target_variable="Diabetes_binary"):
         df, target_variable, test_size=0.2, random_state=42
     )
     x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
-    batch_sizes = [8, 16, 32, 64, 128, x_train_scaled.shape[0]]
+    batch_sizes = [8, 16, 32, 64, 128]
+    ''', x_train_scaled.shape[0]'''
 
     # Dictionary to store losses for different batch sizes
     losses_by_batch_size = {}
@@ -199,8 +200,8 @@ def mbsgd_test_batch_sizes(df, target_variable="Diabetes_binary"):
 
     # Train models with different batch sizes and record training loss over iterations
     for batch_size in batch_sizes:
-        model = MiniBatchLogisticRegression(batch_size=batch_size)
-        losses = model.fit(x_train_scaled, y_train)
+        model = MiniBatchLogisticRegression(batch_size=batch_size, learning_rate=0.003)
+        _, losses = model.fit(x_train_scaled, y_train)
         losses_by_batch_size[batch_size] = losses
     plot_batch_sizes_result(losses_by_batch_size, {}, 1, title1="Task3.4_logistic")
 
@@ -262,7 +263,7 @@ def logistic_regression_test_learning_rates(df, target_variable="Diabetes_binary
             mini_pre_test,
             mini_rec_train,
             mini_rec_test,
-        ) = evaluate_model(minibatch, x_train, y_train, x_test_scaled, y_test)
+        ) = evaluate_model(minibatch, x_train_scaled, y_train, x_test_scaled, y_test)
 
         results["mini_acc_train"].append(mini_acc_train)
         results["mini_acc_test"].append(mini_acc_test)

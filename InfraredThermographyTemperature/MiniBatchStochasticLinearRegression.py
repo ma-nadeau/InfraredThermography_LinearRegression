@@ -11,7 +11,7 @@ class MiniBatchStochasticLinearRegression:
 
     def __init__(
         self,
-        learning_rate=0.001,
+        learning_rate=0.01,
         max_iter=1000,
         batch_size=32,
         epsilon=1e-6,
