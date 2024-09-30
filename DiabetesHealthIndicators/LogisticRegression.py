@@ -15,7 +15,7 @@ class LogisticRegression:
     epsilon : float
         Convergence threshold for gradient descent (default is 1e-8).
     add_bias : bool
-        Whether or not to add a bias term to the input features (default is True).
+        Whether to add a bias term to the input features (default is True).
     epochs : int
         Number of epochs for the training process (default is 10).
     weights : numpy.ndarray

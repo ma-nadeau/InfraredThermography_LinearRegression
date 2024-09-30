@@ -75,8 +75,8 @@ def perform_logistic_regression(df, target_variable="Diabetes_binary", model_typ
     model_type : str, optional
         Type of logistic regression ('standard' or 'mini_batch').
     """
-    # Perform undersampling on the dataset to balance the target classes.
-    x_train, x_test, y_train, y_test = undersampling_dataset(df, target_variable)
+    # Perform oversampling on the dataset to balance the target classes.
+    x_train, x_test, y_train, y_test = oversampling_dataset(df, target_variable)
 
     # Scale the training and test data.
     x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
@@ -168,8 +168,8 @@ def logistic_regression_test_growing_subset(df, target_variable="Diabetes_binary
     target_variable : str
         The target variable for prediction (default is 'Diabetes_binary').
     """
-    # Perform undersampling on the dataset and scale the data.
-    x_train, x_test, y_train, y_test = undersampling_dataset(df, target_variable)
+    # Perform oversampling on the dataset and scale the data.
+    x_train, x_test, y_train, y_test = oversampling_dataset(df, target_variable)
     x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 
     # Dictionary to store results for logistic regression and mini-batch logistic regression.
@@ -281,7 +281,7 @@ def logistic_regression_test_learning_rates(df, target_variable="Diabetes_binary
     target_variable : str
         The target variable for prediction (default is 'Diabetes_binary').
     """
-    # Perform undersampling on the dataset and scale the data.
+    # Perform oversampling on the dataset and scale the data.
     x_train, x_test, y_train, y_test = oversampling_dataset(df, target_variable)
     x_train_scaled, x_test_scaled = scale_data(x_train, x_test)
 

@@ -199,39 +199,6 @@ def stochastic_gradient_descent(self, x, y):
     """
     Implement stochastic gradient descent.
     """
-    # n_samples, n_features = x.shape
-    #
-    # for i in range(n_samples):  # Iterate over all the samples in the X
-    #     rand_index = np.random.randint(
-    #         n_samples
-    #     )  # fetch the index of random value in x
-    #
-    #     x_rand, y_rand = (
-    #         x[rand_index],
-    #         y[rand_index],
-    #     )  # Obtain the two corresponding sample and result
     grad = self.gradient(x, y)
     self.weights = self.weights - self.learning_rate * grad
 
-    # if np.linalg.norm(grad) < self.epsilon:
-    #     break
-    #
-    # for (x_batch, y_batch) in mini_batches:  # Iterate over all the samples in the X
-    #     # fetch the index of random value in x
-    #     print('x batch')
-    #     print(x_batch)
-    #
-    #     print('y batch')
-    #     print(y_batch)
-    #
-    #     rand_index = np.random.randint(len(x_batch))
-    #     # Obtain the two corresponding sample and result
-    #     x_rand, y_rand = (
-    #         x_batch[rand_index],
-    #         y_batch[rand_index],
-    #     )
-    #
-    #     grad = self.gradient(x_rand, y_rand)
-    #     self.weights = self.weights - self.learning_rate * grad
-    #     if np.linalg.norm(grad) < self.epsilon:
-    #         break
