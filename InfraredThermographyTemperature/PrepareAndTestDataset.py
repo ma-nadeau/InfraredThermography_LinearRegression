@@ -291,7 +291,8 @@ def main():
         "T_RC_Dry1", "T_RC_Wet1", "T_RC_Max1", "T_LC_Dry1", "T_LC_Wet1", "T_LC_Max1",
         "canthi4Max1", "T_FHRC1", "T_FHLC1", "T_FHBC1", "T_FHTC1", "T_OR1", "T_Max1",
         "T_FH_Max1", "T_FHC_Max1", "LCC1", "canthiMax1", "Max1R13_1", "aveAllL13_1",
-        "T_RC1", "T_LC1", "RCC1", "aveOralF"
+        "T_RC1", "T_LC1", "RCC1", "aveOralF", "Gender", "Age", "Ethnicity", "T_atm",
+        "Humidity", "Distance"
     ]
     df.drop(columns_to_drop, axis=1, inplace=True)
 
