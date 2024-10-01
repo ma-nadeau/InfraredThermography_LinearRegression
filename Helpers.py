@@ -150,6 +150,22 @@ def adaptive_moment_estimation(
     adam_epsilon,
     gradient_fn,
 ):
+    """
+    Performs one step of the ADAM optimization algorithm.
+
+    x_batch: The input data batch.
+    y_batch: The target values corresponding to the x_batch.
+    weights: Current weights of the model.
+    m: The first moment vector (moving average of the gradients).
+    v: The second moment vector (moving average of the squared gradients).
+    t: The current timestep.
+    learning_rate: The learning rate (alpha).
+    beta1: Exponential decay rate for the first moment estimates.
+    beta2: Exponential decay rate for the second moment estimates.
+    adam_epsilon: Small constant to prevent division by zero.
+    gradient_fn: Function to compute the gradient of the loss with respect to weights.
+    return Updated weights, first moment vector (m), second moment vector (v), and updated timestep (t).
+    """
     n_samples = x_batch.shape[0]
 
     for i in range(n_samples):  # Iterate over mini-batch
@@ -178,10 +194,6 @@ def create_array_minibatch(x, y, batch_size):
     """
     Create mini-batches for mini-batch gradient descent.
     """
-    # matrix = np.c_[x, y]
-    # np.random.shuffle(matrix)
-    # mini_batches = np.array_split(matrix, batch_size)
-    # return [(batch[:, :-1], batch[:, -1]) for batch in mini_batches]
 
     matrix = np.c_[x, y]
     np.random.shuffle(matrix)
@@ -190,8 +202,6 @@ def create_array_minibatch(x, y, batch_size):
         batch = matrix[i : i + batch_size]
         mini_batches.append((batch[:, :-1], batch[:, -1]))
 
-    # mini_batches = np.array_split(matrix, batch_size)
-    # return [(batch[:, :-1], batch[:, -1]) for batch in mini_batches]
     return mini_batches
 
 
@@ -201,4 +211,3 @@ def stochastic_gradient_descent(self, x, y):
     """
     grad = self.gradient(x, y)
     self.weights = self.weights - self.learning_rate * grad
-
