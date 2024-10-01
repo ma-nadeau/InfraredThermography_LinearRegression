@@ -1,4 +1,4 @@
-# Regression Analysis Project
+# Linear & Logistic Regression
 
 This project implements both linear regression and logistic regression from scratch. You can easily run the analysis on two different datasets by following the instructions below.
 
