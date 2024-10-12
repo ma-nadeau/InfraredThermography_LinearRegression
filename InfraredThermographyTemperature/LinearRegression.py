@@ -27,6 +27,7 @@ class LinearRegression:
             y_hat (vector): A vector containing the predicted targets
         """
         # Add a column of 1 to X -> [1, x1, x2, ..., x_D]^T
+
         x_w0 = np.c_[np.ones(X.shape[0]), X]  # c_ -> concatenates along second axis
         y_hat = x_w0 @ self.weights  # y_hat = X * w
         return y_hat  # Returns the prediction made by our model
