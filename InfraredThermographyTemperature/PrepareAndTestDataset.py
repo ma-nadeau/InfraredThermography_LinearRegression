@@ -1,6 +1,6 @@
 from sklearn.preprocessing import LabelEncoder
-from Helpers import *
-from PlotHelpers import *
+from InfraredThermographyTemperature.Helpers import *
+from InfraredThermographyTemperature.PlotHelpers import *
 from LinearRegression import LinearRegression
 from MiniBatchStochasticLinearRegression import *
 

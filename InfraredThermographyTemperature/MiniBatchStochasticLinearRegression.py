@@ -1,5 +1,5 @@
 import numpy as np
-from Helpers import (
+from InfraredThermographyTemperature.Helpers import (
     adaptive_moment_estimation,
     stochastic_gradient_descent,
     create_array_minibatch,
