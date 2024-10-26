@@ -1,6 +1,6 @@
 from sklearn.preprocessing import LabelEncoder
-from Assignment1.Helpers import *
-from Assignment1.PlotHelpers import *
+from Helpers import *
+from PlotHelpers import *
 from LinearRegression import LinearRegression
 from MiniBatchStochasticLinearRegression import *
 

@@ -1,5 +1,5 @@
 import numpy as np
-from Assignment1.Helpers import (
+from Helpers import (
     adaptive_moment_estimation,
     stochastic_gradient_descent,
     create_array_minibatch,
