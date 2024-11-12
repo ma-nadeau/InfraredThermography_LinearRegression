@@ -2,6 +2,11 @@
 
 This project implements a linear regression model from scratch. You can easily run the analysis on the dataset by following the instructions below.
 
+## Contributors
+
+Created by [Marc-Antoine Nadeau](https://github.com/ma-nadeau), [Jessie Kurtz](https://github.com/jkzcodes), and [Baicheng Peng](https://github.com/sivess)
+
+
 ## How to Run
 
 To perform linear regression on the **Infrared Thermography Temperature** dataset:
